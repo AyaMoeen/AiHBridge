@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { InputWithIcon } from "@/components/ui/InputWithIcon";
 import { User, AtSign, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { registerUser } from "@/services/authService";
 
 export default function SingUp() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -12,13 +13,24 @@ export default function SingUp() {
   const [email, setEmail] = useState("");
   const [username, setUserName] = useState("");
 
-  const handleToSubmit = () => {
-    console.log("name  " + name);
-    console.log("email  " + email);
-    console.log("username  " + username);
-    console.log("Password  " + password);
-    console.log("confirmPassword  " + confirmPassword);
-  };
+const handleToSubmit = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const data = await registerUser({ username, name, email, password });
+
+      console.log("User registered:", data);
+      alert("Account created successfully!");
+
+      localStorage.setItem("authToken", data.token);
+      window.location.href = "/dashboard";
+    } catch (error: any) {
+      alert(error.message || "Network error, try again later");
+    }
+};
 
   return (
     <div
