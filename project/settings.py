@@ -32,6 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "corsheaders",
+    'rest_framework',
+    'rest_framework.authtoken',
     'accounts.apps.AccountsConfig',
     'posts.apps.PostsConfig',
     'django.contrib.admin',
@@ -42,7 +45,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,3 +142,31 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", 
+]
+
+CORS_ALLOW_CREDENTIALS = True 
+## auth user model
+AUTH_USER_MODEL = 'accounts.User'
+
+##### FOR TERMINAL 
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# # For testing, prints emails to console. In production, use SMTP:
+# # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# # EMAIL_HOST = 'smtp.example.com'
+# # EMAIL_PORT = 587
+# # EMAIL_USE_TLS = True
+# # EMAIL_HOST_USER = 'your-email@example.com'
+# # EMAIL_HOST_PASSWORD = 'your-email-password'
+# DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+
+## SEND REAL EMAIL 
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "moinaya07@gmail.com"     
+# EMAIL_HOST_PASSWORD = "aciq bgqy rxfg acsv"  
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
