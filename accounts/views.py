@@ -1,17 +1,14 @@
-from rest_framework import generics
+from django.utils import timezone
+from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework import status
-from django.contrib.auth import get_user_model
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
 from .serializers import RegisterSerializer
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.permissions import AllowAny
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
-from rest_framework import status
+from django.contrib.auth import get_user_model
+from .utils import (
+    generate_code, generate_reset_token, send_reset_code_email,
+    get_user_by_email, get_user_by_reset_code, get_user_by_reset_token, is_reset_code_expired
+)
 
 User = get_user_model()
 
@@ -22,63 +19,91 @@ class RegisterView(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
-        user = User.objects.get(email=response.data['email'])
-        token, created = Token.objects.get_or_create(user=user)
+        user = get_user_by_email(response.data['email'])
+        token, _ = Token.objects.get_or_create(user=user)
         response.data['token'] = token.key
         return response
 
-class LogoutView(APIView):
+
+class LogoutView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         request.user.auth_token.delete()
-        return Response({"message": "Successfully logged out"}, status=200)
-    
-# class PasswordResetAPIView(generics.GenericAPIView):
-#     permission_classes = [AllowAny]
-#     def post(self, request):
-#         email = request.data.get('email')
-#         if not email:
-#             return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
 
-#         try:
-#             user = User.objects.get(email=email)
-#         except User.DoesNotExist:
-#             return Response({"message": "If this email exists, a reset link has been sent."})
 
-#         uid = urlsafe_base64_encode(force_bytes(user.pk))
-#         token = default_token_generator.make_token(user)
-#         reset_link = f"http://localhost:3000/reset-password/{uid}/{token}/"  
+class PasswordResetAPIView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
 
-#         send_mail(
-#             subject="Password Reset",
-#             message=f"Use this link to reset your password: {reset_link}",
-#             from_email=None,
-#             recipient_list=[user.email],
-#         )
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         return Response({"message": "Password reset link sent."})
-    
-# class PasswordResetConfirmAPIView(generics.GenericAPIView):
-#     permission_classes = [AllowAny]
-#     def post(self, request):
-#         uid = request.data.get("uid")
-#         token = request.data.get("token")
-#         new_password = request.data.get("new_password")
+        user = get_user_by_email(email)
+        if not user:
+            return Response({"message": "If this email exists, a verification code has been sent."})
 
-#         if not uid or not token or not new_password:
-#             return Response({"error": "UID, token, and new_password are required"},
-#                             status=status.HTTP_400_BAD_REQUEST)
+        code = generate_code()
+        user.reset_code = code
+        user.reset_code_created_at = timezone.now()
+        user.save()
+        send_reset_code_email(user, code)
 
-#         try:
-#             uid = force_str(urlsafe_base64_decode(uid))
-#             user = User.objects.get(pk=uid)
-#         except (User.DoesNotExist, ValueError, TypeError):
-#             return Response({"error": "Invalid UID"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Verification code sent to your email."})
 
-#         if not default_token_generator.check_token(user, token):
-#             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         user.set_password(new_password)
-#         user.save()
-#         return Response({"message": "Password has been reset successfully."})
+class PasswordResetConfirmCodeAPIView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        code = request.data.get("code")
+        if not code:
+            return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_user_by_reset_code(code)
+        if not user:
+            return Response({"error": "Invalid code"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if is_reset_code_expired(user):
+            return Response({"error": "Code has expired"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        reset_token = generate_reset_token()
+        user.reset_token = reset_token
+        user.save()
+
+        return Response({
+            "message": "Code verified successfully. Use this token to reset your password.",
+            "reset_token": reset_token
+        })
+
+
+class PasswordResetSetNewPasswordAPIView(generics.GenericAPIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        reset_token = request.data.get("reset_token")
+        new_password = request.data.get("new_password")
+        confirm_password = request.data.get("confirm_password")
+
+        if not reset_token or not new_password or not confirm_password:
+            return Response(
+                {"error": "reset_token, new_password, and confirm_password are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if new_password != confirm_password:
+            return Response({"error": "Passwords do not match"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_user_by_reset_token(reset_token)
+        if not user:
+            return Response({"error": "Invalid or expired token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.reset_code = None
+        user.reset_token = None
+        user.reset_code_created_at = None
+        user.save()
+
+        return Response({"message": "Password has been reset successfully."})
