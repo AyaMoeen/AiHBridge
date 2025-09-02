@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "blog"
+name = "aihbridge"
 version = "0.1.0"
 description = ""
 authors = ["AyaMoeen <ayamoinn95@gmail.com>"]
@@ -10,10 +10,16 @@ python = "^3.12"
 django = "^5.2.5"
 ruff = "^0.12.9"
 pytest = "^8.4.1"
-mypy = "^1.17.1"
 djangorestframework = "^3.16.1"
+python-decouple = "^3.8"
 django-cors-headers = "^4.7.0"
 
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.17.1"
+djangorestframework-stubs = "^3.16.2"
+types-requests = "^2.32.4.20250809"
+django-stubs = "^5.2.2"
 
 [build-system]
 requires = ["poetry-core"]
