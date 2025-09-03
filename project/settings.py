@@ -26,12 +26,12 @@ SECRET_KEY = 'django-insecure-1jiu43zz)*^pw!*z1z-bdif^ewld-odmcuipjp3k3x7fi$q-4a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = []
 
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS: list[str] = [
     "corsheaders",
     'rest_framework',
     'rest_framework.authtoken',
@@ -55,7 +55,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -151,22 +151,19 @@ CORS_ALLOW_CREDENTIALS = True
 ## auth user model
 AUTH_USER_MODEL = 'accounts.User'
 
-##### FOR TERMINAL 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# # For testing, prints emails to console. In production, use SMTP:
-# # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# # EMAIL_HOST = 'smtp.example.com'
-# # EMAIL_PORT = 587
-# # EMAIL_USE_TLS = True
-# # EMAIL_HOST_USER = 'your-email@example.com'
-# # EMAIL_HOST_PASSWORD = 'your-email-password'
-# DEFAULT_FROM_EMAIL = 'webmaster@localhost'
-
 ## SEND REAL EMAIL 
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = "smtp.gmail.com"
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = "moinaya07@gmail.com"     
-# EMAIL_HOST_PASSWORD = "aciq bgqy rxfg acsv"  
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "moinaya07@gmail.com"     
+EMAIL_HOST_PASSWORD = "aciq bgqy rxfg acsv"  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+## const 
+USERNAME_SUFFIX_LENGTH = 8
+USERNAME_MAX_LENGTH = 150
+NAME_MAX_LENGTH = 255
+RESET_CODE_LENGTH = 6
+RESET_TOKEN_LENGTH = 36
+RESET_CODE_EXPIRY_MINUTES = 10
