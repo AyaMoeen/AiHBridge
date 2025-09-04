@@ -1,9 +1,6 @@
-from django.shortcuts import render
 from rest_framework import generics, permissions
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import Post, Category
-from .serializers import PostSerializer, CategorySerializer
+from .models import Post
+from .serializers import PostSerializer
 
 
 class PostListCreateView(generics.ListCreateAPIView):

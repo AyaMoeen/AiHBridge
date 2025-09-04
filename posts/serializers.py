@@ -4,7 +4,7 @@ from .models import Post, Category
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = '__all__'
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -16,11 +16,8 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = [
-            'id', 'user', 'title', 'link', 'description',
-            'personal_review', 'categories', 'category_ids',
-            'created_at', 'updated_at'
-        ]
+        fields = '__all__'
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         categories = validated_data.pop("categories", [])
