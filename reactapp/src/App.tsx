@@ -1,4 +1,5 @@
 
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
@@ -30,7 +31,6 @@ const RegisterPage = () => (
     <p className="mt-4">Registration form coming soon...</p>
   </div>
 );
-
 // ✅ Header Component
 function Header() {
   const { toggleSidebar } = useSidebar();
