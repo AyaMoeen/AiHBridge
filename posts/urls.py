@@ -1,11 +1,9 @@
 from django.urls import path
-from django.views.generic import TemplateView
 from . import views
 app_name = "posts"
 
 
 urlpatterns = [
-
     path('', views.PostListCreateView.as_view(), name='post-list'),
     path('<int:pk>/', views.PostDetailView.as_view(), name='post-detail'),
 ]
