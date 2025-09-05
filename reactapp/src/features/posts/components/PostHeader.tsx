@@ -8,12 +8,14 @@ interface Props {
   badges: string[];
   rating: number;
   shareUrl: string;
+  title: string;
 }
 export default function PostHeader({
   author,
   badges,
   rating,
   shareUrl,
+  title,
 }: Props) {
   return (
     <CardHeader className="flex flex-col gap-6">
@@ -37,7 +39,9 @@ export default function PostHeader({
           </Button>
         </a>
       </div>
-
+      <CardTitle className="text-lg font-bold text-foreground my-2">
+        {title}
+      </CardTitle>
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           {badges.map((badge) => (
