@@ -36,6 +36,7 @@ INSTALLED_APPS: list[str] = [
     'rest_framework',
     'rest_framework.authtoken',
     'accounts.apps.AccountsConfig',
+    'core.apps.CoreConfig',
     'posts.apps.PostsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
