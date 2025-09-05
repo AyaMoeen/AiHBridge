@@ -17,7 +17,9 @@ export default function Post({ post, maxChars = 150, showLearnMore }: Props) {
           badges={post.badges}
           rating={post.rating}
           shareUrl={post.shareUrl}
+          title={post.title}
         />
+
         <PostContent
           postId={post.id}
           description={post.description}
