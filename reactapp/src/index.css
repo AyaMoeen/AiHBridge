@@ -204,6 +204,7 @@
   body {
     @apply bg-background text-foreground;
   }
+
 }
 
 .animate-fade-in {
@@ -230,3 +231,5 @@
 [data-width="4"] {
   width: 100%;
 }
+
+
