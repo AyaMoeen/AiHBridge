@@ -35,6 +35,7 @@ INSTALLED_APPS: list[str] = [
     "corsheaders",
     'rest_framework',
     'rest_framework.authtoken',
+    'search.apps.SearchConfig',
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
     'posts.apps.PostsConfig',
@@ -168,3 +169,9 @@ NAME_MAX_LENGTH = 255
 RESET_CODE_LENGTH = 6
 RESET_TOKEN_LENGTH = 36
 RESET_CODE_EXPIRY_MINUTES = 10
+CONST_ZERO = 0
+CONST_ONE = 1
+CONST_TWO = 2
+CONST_THREE = 3
+LIMIT = 10
+RANGE = 15
