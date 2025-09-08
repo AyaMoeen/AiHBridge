@@ -15,7 +15,7 @@ class ProfileViewSet(viewsets.ViewSet):
 
     def list(self, request):
         """
-        GET /profiles/ → جلب بروفايل المستخدم الحالي
+        GET /profiles/ 
         """
         profile = self.get_queryset().get(user=request.user)
         serializer = ProfileSerializer(profile)
@@ -24,7 +24,7 @@ class ProfileViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['patch', 'put'])
     def update_profile(self, request):
         """
-        PATCH /profiles/update_profile/ → تحديث بروفايل المستخدم الحالي
+        PATCH /profiles/update_profile/ 
         """
         profile = self.get_queryset().get(user=request.user)
         serializer = ProfileSerializer(profile, data=request.data, partial=True)

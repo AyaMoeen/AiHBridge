@@ -1,10 +1,10 @@
 from django.utils import timezone
-from rest_framework import generics, status
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import RegisterSerializer
 from django.contrib.auth import get_user_model
+from .serializers import RegisterSerializer
 from .utils import (
     generate_code, generate_reset_token, send_reset_code_email,
     get_user_by_email, get_user_by_reset_code, get_user_by_reset_token, is_reset_code_expired
@@ -12,52 +12,59 @@ from .utils import (
 
 User = get_user_model()
 
-class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
-    permission_classes = [AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        user = get_user_by_email(response.data['email'])
+class AccountViewSet(viewsets.ViewSet):
+    """
+    A ViewSet for handling user registration, login/logout, and password reset.
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def login(self, request):
+        from django.contrib.auth import authenticate
+        email = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(request, username=email, password=password)
+        if user is None:
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
         token, _ = Token.objects.get_or_create(user=user)
-        response.data['token'] = token.key
-        return response
+        return Response({"token": token.key})
 
 
-class LogoutView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def register(self, request):
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token, _ = Token.objects.get_or_create(user=user)
+        data = serializer.data
+        data['token'] = token.key
+        return Response(data, status=status.HTTP_201_CREATED)
 
-    def post(self, request):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def logout(self, request):
         request.user.auth_token.delete()
         return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
 
-
-class PasswordResetAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def password_reset(self, request):
         email = request.data.get('email')
         if not email:
             return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         user = get_user_by_email(email)
-        if not user:
-            return Response({"message": "If this email exists, a verification code has been sent."})
+        if user:
+            code = generate_code()
+            user.reset_code = code
+            user.reset_code_created_at = timezone.now()
+            user.save()
+            send_reset_code_email(user, code)
 
-        code = generate_code()
-        user.reset_code = code
-        user.reset_code_created_at = timezone.now()
-        user.save()
-        send_reset_code_email(user, code)
+        # Return success message even if email does not exist for security
+        return Response({"message": "If this email exists, a verification code has been sent."})
 
-        return Response({"message": "Verification code sent to your email."})
-
-
-class PasswordResetConfirmCodeAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def password_reset_confirm_code(self, request):
         code = request.data.get("code")
         if not code:
             return Response({"error": "Code is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +75,7 @@ class PasswordResetConfirmCodeAPIView(generics.GenericAPIView):
 
         if is_reset_code_expired(user):
             return Response({"error": "Code has expired"}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         reset_token = generate_reset_token()
         user.reset_token = reset_token
         user.save()
@@ -78,11 +85,8 @@ class PasswordResetConfirmCodeAPIView(generics.GenericAPIView):
             "reset_token": reset_token
         })
 
-
-class PasswordResetSetNewPasswordAPIView(generics.GenericAPIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def password_reset_set_new_password(self, request):
         reset_token = request.data.get("reset_token")
         new_password = request.data.get("new_password")
         confirm_password = request.data.get("confirm_password")
