@@ -105,9 +105,7 @@ class PostDetailTest(PostAPITestSetup):
             "category_ids": [c.id for c in self.post.categories.all()],
         }
         response = self.client.put(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.post.refresh_from_db()
-        self.assertEqual(self.post.title, "Hack Post") 
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_post_authenticated_owner(self):
         self.client.force_authenticate(user=self.user)
@@ -121,3 +119,24 @@ class PostDetailTest(PostAPITestSetup):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertTrue(Post.objects.filter(id=self.post.id).exists())
+
+class PostMyPostsTest(PostAPITestSetup):
+    def test_my_posts_authenticated(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse("posts:post-my-posts")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["title"], self.post.title)
+
+    def test_my_posts_count_authenticated(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse("posts:post-my-posts-count")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["my_posts_count"], 1)
+
+    def test_my_posts_unauthenticated(self):
+        url = reverse("posts:post-my-posts")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
