@@ -1,14 +1,18 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { ScreenShare, Star } from "lucide-react";
-
+import { ScreenShare, Star, Trash2 } from "lucide-react";
+import { SquarePen } from "lucide-react";
 interface Props {
   author: { name: string; username: string; avatar?: string };
   badges: string[];
   rating: number;
   shareUrl: string;
   title: string;
+  showEdit?: boolean;
+  onEditClick?: () => void;
+  showDelete?: boolean;
+  onDeleteClick?: () => void;
 }
 export default function PostHeader({
   author,
@@ -16,6 +20,10 @@ export default function PostHeader({
   rating,
   shareUrl,
   title,
+  showEdit = false,
+  onEditClick,
+  showDelete = false,
+  onDeleteClick,
 }: Props) {
   return (
     <CardHeader className="flex flex-col gap-6">
@@ -33,13 +41,33 @@ export default function PostHeader({
             </span>
           </div>
         </div>
-        <a href={shareUrl} target="_blank" rel="noopener noreferrer">
-          <Button variant="ghost" className="p-5 hover:cursor-pointer">
-            <ScreenShare className="w-4 h-5 text-muted-foreground" />
-          </Button>
-        </a>
+        <div className="flex items-center gap-4">
+          <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="ghost" className="p-5 hover:cursor-pointer">
+              <ScreenShare className="w-4 h-5 text-muted-foreground" />
+            </Button>
+          </a>
+          {showEdit && (
+            <Button
+              variant="ghost"
+              className="p-5 hover:cursor-pointer"
+              onClick={onEditClick}
+            >
+              <SquarePen className="w-4 h-5 text-muted-foreground" />
+            </Button>
+          )}
+          {showDelete && (
+            <Button
+              variant="ghost"
+              className="p-5 hover:cursor-pointer hover:bg-red-600/10"
+              onClick={onDeleteClick}
+            >
+              <Trash2 className="w-4 h-5 text-muted-foreground" />
+            </Button>
+          )}
+        </div>
       </div>
-      <CardTitle className="text-lg font-bold text-foreground my-2">
+      <CardTitle className="text-lg font-bold text-foreground my-1">
         {title}
       </CardTitle>
       <div className="flex items-center justify-between">
@@ -53,10 +81,9 @@ export default function PostHeader({
             </Badge>
           ))}
         </div>
-        <div className="flex items-center gap-1 mr-4">
-          <Star className="text-yellow-400 w-4" />
-          <span className="text-sm font-medium text-foreground">{rating}</span>
-        </div>
+        <span className="flex items-center gap-1 text-yellow-500 font-semibold">
+          <Star className="w-4 h-4 fill-yellow-500" /> {rating}
+        </span>
       </div>
     </CardHeader>
   );
