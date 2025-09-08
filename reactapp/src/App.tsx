@@ -3,109 +3,40 @@ import {
   Routes,
   Route,
   Navigate,
-  useNavigate,
 } from "react-router-dom";
-import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
 import { useAuth } from "./hooks/useAuth";
 import "./index.css";
 
 import { AppSidebar } from "./components/app-sidebar";
-import { SidebarProvider, useSidebar } from "./components/ui/sidebar";
+import { SidebarProvider } from "./components/ui/sidebar";
 
 import LoginPage from "./features/auth/pages/LoginPage";
 import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
 import VerificationPage from "./features/auth/pages/VerificationPage";
 import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { Button } from "./components/ui/button";
-import { Bell, LogOut, Menu, Moon, Sun } from "lucide-react";
-import { Input } from "./components/ui/input";
 import HomePage from "./pages/HomePage";
 import PostDetails from "./pages/PostDetails";
 import SingUp from "./pages/SingUp";
-
-// ✅ Header Component
-function Header() {
-  const { toggleSidebar } = useSidebar();
-  const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  return (
-    <header className="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      {/* Left: Sidebar Toggle & Search */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={toggleSidebar}>
-          <Menu className="h-6 w-6" />
-        </Button>
-        <Input type="text" placeholder="Search..." className="w-64" />
-      </div>
-
-      {/* Right: Actions */}
-      <div className="flex items-center gap-4">
-        {/* Notification Icon */}
-        <Button variant="ghost" size="icon">
-          <Bell className="h-6 w-6" />
-        </Button>
-        {/* Theme Toggle */}
-        <Button variant="ghost" size="icon" onClick={toggleTheme}>
-          {theme === "dark" ? (
-            <Sun className="h-6 w-6" />
-          ) : (
-            <Moon className="h-6 w-6" />
-          )}
-        </Button>
-        {user ? (
-          <Button
-            className="flex items-center gap-2 bg-gray-500 dark:bg-gray-700"
-            onClick={() => {
-              logout();
-              navigate("/login"); // optional redirect بعد logout
-            }}
-          >
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
-        ) : (
-          <>
-            <Button
-              className="bg-secondary font-serif"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </Button>
-            <Button
-              className="bg-secondary font-serif"
-              onClick={() => navigate("/register")}
-            >
-              Sign Up
-            </Button>
-          </>
-        )}{" "}
-      </div>
-    </header>
-  );
-}
-
-// ✅ Layout that shows Sidebar if logged in + Header + Centered Content
+import MySavedPost from "./pages/MySavedPost";
+import MyPost from "./pages/MyPost";
+import Header from "./components/Header";
+import Rightbar from "./components/RightBar";
 function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
 
   return (
     <div className="flex min-h-screen w-full">
-      {<AppSidebar />}
+      <AppSidebar />
       <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
-        {<Header />} {/* ✅ Show header only if logged in */}
-        <main className="flex-1 flex items-center justify-start p-4 flex-row ml-20">
-          <div className="w-full max-w-3xl">{children}</div>
-        </main>
+        <Header />
+        <div className="flex flex-1 p-4">
+          <main className="flex-1 flex justify-center">
+            <div className="w-full max-w-3xl flex flex-col items-center">{children}</div>
+          </main>
+          <Rightbar />
+        </div>
       </div>
     </div>
   );
@@ -119,7 +50,6 @@ function App() {
           <SidebarProvider>
             <Layout>
               <Routes>
-                {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<SingUp />} />
                 <Route
@@ -128,14 +58,11 @@ function App() {
                 />
                 <Route path="/verify-code" element={<VerificationPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
-
-                {/* Protected Routes */}
-                <Route path="/" element={<HomePage />} />
-
-                {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />
-
+                <Route path="/" element={<HomePage />} />
                 <Route path="/posts/:id" element={<PostDetails />} />
+                <Route path="/saved" element={<MySavedPost />} />
+                <Route path="/my-posts" element={<MyPost />} />
               </Routes>
             </Layout>
           </SidebarProvider>
