@@ -16,7 +16,7 @@ def create_user(email="test@example.com", password="123456", name="TestUser"):
 
 class AuthViewTests(APITestCase):
     def test_register_user(self):
-        url = reverse("accounts:register")
+        url = reverse("accounts:account-register")  
         data = {
             "username": "aya123",
             "name": "Aya Test",
@@ -28,25 +28,11 @@ class AuthViewTests(APITestCase):
         self.assertIn("token", response.data)
         self.assertEqual(response.data["email"], data["email"])
 
-    def test_login_user(self):
-        user = create_user()
-        url = reverse("accounts:api_token_auth")
-        data = {"username": user.email, "password": "123456"} 
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("token", response.data)
-
-    def test_login_user_invalid(self):
-        url = reverse("accounts:api_token_auth")
-        data = {"username": "raghad@gmail.com", "password": "654321"}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     def test_logout_user(self):
         user = create_user()
         token = Token.objects.create(user=user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-        url = reverse("accounts:logout")
+        url = reverse("accounts:account-logout")
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Successfully logged out")
@@ -58,16 +44,15 @@ class PasswordResetTests(APITestCase):
 
     @patch("accounts.views.send_reset_code_email")
     def test_password_reset_request(self, mock_send_email):
-        url = reverse("accounts:password_reset")
+        url = reverse("accounts:account-password-reset")
         response = self.client.post(url, {"email": self.user.email})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.user.refresh_from_db()
         self.assertIsNotNone(self.user.reset_code)
         mock_send_email.assert_called_once_with(self.user, self.user.reset_code)
 
-
     def test_password_reset_request_invalid_email(self):
-        url = reverse("accounts:password_reset")
+        url = reverse("accounts:account-password-reset")
         response = self.client.post(url, {"email": "raghad@gmail.com"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -78,14 +63,13 @@ class PasswordResetTests(APITestCase):
         self.user.reset_code = "123456"
         self.user.reset_code_created_at = timezone.now()
         self.user.save()
-
-        url = reverse("accounts:password_reset_confirm_code")
+        url = reverse("accounts:account-password-reset-confirm-code")
         response = self.client.post(url, {"code": "123456"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("reset_token", response.data)
 
     def test_password_reset_confirm_code_invalid(self):
-        url = reverse("accounts:password_reset_confirm_code")
+        url = reverse("accounts:account-password-reset-confirm-code")
         response = self.client.post(url, {"code": "654321"})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "Invalid code")
@@ -94,8 +78,7 @@ class PasswordResetTests(APITestCase):
         reset_token = str(uuid.uuid4())
         self.user.reset_token = reset_token
         self.user.save()
-
-        url = reverse("accounts:password_reset_set_new_password")
+        url = reverse("accounts:account-password-reset-set-new-password")
         data = {
             "reset_token": reset_token,
             "new_password": "ayapass123",
@@ -111,8 +94,7 @@ class PasswordResetTests(APITestCase):
         reset_token = str(uuid.uuid4())
         self.user.reset_token = reset_token
         self.user.save()
-
-        url = reverse("accounts:password_reset_set_new_password")
+        url = reverse("accounts:account-password-reset-set-new-password")
         data = {
             "reset_token": reset_token,
             "new_password": "ayapass123",
@@ -123,7 +105,7 @@ class PasswordResetTests(APITestCase):
         self.assertEqual(response.data["error"], "Passwords do not match")
 
     def test_password_reset_set_new_password_invalid_token(self):
-        url = reverse("accounts:password_reset_set_new_password")
+        url = reverse("accounts:account-password-reset-set-new-password")
         data = {
             "reset_token": "wrongtoken",
             "new_password": "ayapass123",

@@ -2,7 +2,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from accounts.models import User
-from profiles.models import Profile
 from io import BytesIO
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
