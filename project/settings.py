@@ -45,6 +45,7 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'profiles',
 ]
 
 REST_FRAMEWORK = {
@@ -175,3 +176,5 @@ CONST_TWO = 2
 CONST_THREE = 3
 LIMIT = 10
 RANGE = 15
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

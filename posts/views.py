@@ -1,18 +1,75 @@
-from rest_framework import generics, permissions
-from .models import Post
-from .serializers import PostSerializer
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Post, Category
+from .serializers import PostSerializer, CategorySerializer
 
+# Permissions management
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    السماح فقط لصاحب البوست يعدل أو يحذف،
+    لكن باقي المستخدمين يقدروا يشوفوا البوست.
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.user == request.user
 
-class PostListCreateView(generics.ListCreateAPIView):
-    queryset = Post.objects.all().order_by('-created_at')
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API للعرض فقط للكاتيجوريز.
+    """
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.AllowAny]
+
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet لإدارة البوستات: 
+    عرض الكل، عرض بوست محدد، إنشاء، تعديل، حذف،
+    عرض البوستات الخاصة بالمستخدم، وعدد البوستات.
+    """
     serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Post.objects.all()  # dummy, actual filtered in get_queryset
+
+    def get_queryset(self):
+        return (
+            Post.objects
+            .select_related("user", "user__profile")
+            .prefetch_related("categories")
+            .order_by("-created_at")
+        )
+
+    def get_permissions(self):
+        """
+        Permissions مختلفة حسب نوع الـ action.
+        """
+        if self.action in ["list", "retrieve"]:
+            permission_classes = [permissions.AllowAny]
+        elif self.action == "create":
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ["update", "partial_update", "destroy", "my_posts", "my_posts_count"]:
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [perm() for perm in permission_classes]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=False, methods=["get"])
+    def my_posts(self, request):
+        """
+        عرض البوستات الخاصة بالمستخدم الحالي.
+        """
+        posts = self.get_queryset().filter(user=request.user)
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    @action(detail=False, methods=["get"])
+    def my_posts_count(self, request):
+        """
+        يرجع عدد البوستات الخاصة بالمستخدم الحالي.
+        """
+        count = self.get_queryset().filter(user=request.user).count()
+        return Response({"my_posts_count": count}, status=status.HTTP_200_OK)
