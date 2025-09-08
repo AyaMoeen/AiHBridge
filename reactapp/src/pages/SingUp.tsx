@@ -35,7 +35,7 @@ export default function SingUp() {
   return (
     
       <div
-        className="ml-55 border-2 border-[gray] rounded-lg flex items-center justify-center flex-col w-[70%] shadow-lg"
+        className="border-2 border-[gray] rounded-lg flex items-center justify-center flex-col w-[70%] shadow-lg"
         style={{ padding: "20px", boxShadow: "0 5px 10px rgba(0, 0, 0, 0.5)" }}
       >
         <h1 className="text-lg font-bold">

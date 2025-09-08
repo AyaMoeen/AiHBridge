@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 
 import { NavMain } from "@/components/nav-main";
+
 const data = {
   user: {
     name: "Ahmad Tomeh",
@@ -21,7 +22,6 @@ const data = {
       title: "Home",
       url: "/",
       icon: Home,
-      isActive: true,
     },
     {
       title: "My Profile",
@@ -35,7 +35,7 @@ const data = {
     },
     {
       title: "My Post",
-      url: "/posts",
+      url: "/my-posts",
       icon: FileText,
     },
   ],
@@ -43,8 +43,8 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="flex items-start justify-center">
+    <Sidebar collapsible="icon" {...props} className="bg-secondary-foreground">
+      <SidebarHeader className="flex items-start justify-center bg-secondary-foreground">
         <span className="font-semibold group-data-[collapsible=icon]:hidden">
           <span className="w-20 h-20 m-2 rounded p-2 bg-sidebar-primary text-sidebar-primary-foreground text-sm font-bold">
             Ai
