@@ -78,7 +78,7 @@ class AutocompleteViewTest(APITestCase):
             description="AI services on cloud",
             personal_review="Scalable"
         )
-        self.url = reverse("search:autocomplete")
+        self.url = reverse("search:search-autocomplete")
 
     def test_autocomplete_with_prefix(self):
         response = self.client.get(self.url, {"q": "AI"})

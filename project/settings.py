@@ -35,6 +35,7 @@ INSTALLED_APPS: list[str] = [
     "corsheaders",
     'rest_framework',
     'rest_framework.authtoken',
+    'interactions.apps.InteractionsConfig',
     'search.apps.SearchConfig',
     'accounts.apps.AccountsConfig',
     'core.apps.CoreConfig',
@@ -174,6 +175,8 @@ CONST_ZERO = 0
 CONST_ONE = 1
 CONST_TWO = 2
 CONST_THREE = 3
+CONST_FOUR = 4
+CONST_FIVE = 5
 LIMIT = 10
 RANGE = 15
 MEDIA_URL = '/media/'
