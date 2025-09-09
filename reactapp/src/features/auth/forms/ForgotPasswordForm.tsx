@@ -51,11 +51,11 @@ export function ForgotPasswordForm({
     if (isSuccess) {
         return (
             <div className={cn("flex flex-col gap-6", className)} {...props}>
-                <Card className="border-black">
+                <Card>
                     <CardHeader>
                         <div className="flex items-center justify-center gap-2">
                             <GalleryVerticalEnd className="size-6" />
-                            <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                            <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                         </div>
                         <CardDescription>
                             Check your email for verification code
@@ -84,11 +84,11 @@ export function ForgotPasswordForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="border-black">
+            <Card>
                 <CardHeader>
                     <div className="flex items-center justify-center gap-2">
                         <GalleryVerticalEnd className="size-6" />
-                        <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                        <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                     </div>
                     <CardDescription>
                         Enter your email address to receive a verification code
@@ -107,7 +107,7 @@ export function ForgotPasswordForm({
                                         placeholder="Enter your email address"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-10"
+                                        className="pl-10 border-gray-400"
                                         required
                                     />
                                 </div>

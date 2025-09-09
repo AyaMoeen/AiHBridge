@@ -87,11 +87,11 @@ export function VerificationForm({
     if (isSuccess) {
         return (
             <div className={cn("flex flex-col gap-6", className)} {...props}>
-                <Card className="border-black">
+                <Card>
                     <CardHeader>
                         <div className="flex items-center justify-center gap-2">
                             <GalleryVerticalEnd className="size-6" />
-                            <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                            <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                         </div>
                         <CardDescription>
                             Code verified successfully
@@ -117,11 +117,11 @@ export function VerificationForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="border-black">
+            <Card>
                 <CardHeader>
                     <div className="flex items-center justify-center gap-2">
                         <GalleryVerticalEnd className="size-6" />
-                        <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                        <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                     </div>
                     <CardDescription>
                         Enter the 6-digit verification code sent to your email
@@ -140,7 +140,7 @@ export function VerificationForm({
                                         placeholder="Enter 6-digit code"
                                         value={code}
                                         onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                        className="pl-10 text-center text-lg tracking-widest"
+                                        className="pl-10 text-center text-lg tracking-widest border-gray-400"
                                         maxLength={6}
                                         required
                                     />

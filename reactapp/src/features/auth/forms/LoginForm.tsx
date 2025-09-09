@@ -20,11 +20,11 @@ export function LoginForm({
 
     return (
         <div className={cn("flex flex-col gap-6 ", className)} {...props}>
-            <Card className="border-black">
+            <Card className="">
                 <CardHeader>
                     <div className="flex items-center justify-center gap-2">
                         <GalleryVerticalEnd className="size-6" />
-                        <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                        <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                     </div>
                     <CardDescription>
                         Enter your email below to login to your account
@@ -39,6 +39,7 @@ export function LoginForm({
                                     id="email"
                                     type="email"
                                     placeholder="m@example.com"
+                                    className="border-gray-200"
                                     required
                                 />
                             </div>
@@ -53,7 +54,7 @@ export function LoginForm({
                                         Forgot your password?
                                     </button>
                                 </div>
-                                <Input id="password" type="password" required />
+                                <Input id="password" type="password" className="border-gray-200" placeholder="*******" required />
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Button type="submit" className="w-full">
