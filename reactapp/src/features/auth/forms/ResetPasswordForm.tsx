@@ -69,11 +69,11 @@ export function ResetPasswordForm({
     if (isSuccess) {
         return (
             <div className={cn("flex flex-col gap-6", className)} {...props}>
-                <Card className="border-black">
+                <Card>
                     <CardHeader>
                         <div className="flex items-center justify-center gap-2">
                             <GalleryVerticalEnd className="size-6" />
-                            <CardTitle className="text-white text-center text-xl">AIHBridge</CardTitle>
+                            <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
                         </div>
                         <CardDescription>
                             Password reset successfully
@@ -102,9 +102,9 @@ export function ResetPasswordForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="border-black">
+            <Card>
                 <CardHeader>
-                    <CardTitle className="text-white text-center text-xl" >Reset New Password</CardTitle>
+                    <CardTitle className="text-center text-xl" >Reset New Password</CardTitle>
                     <CardDescription>
                         Create a strong password for your account
                     </CardDescription>
@@ -123,7 +123,7 @@ export function ResetPasswordForm({
                                         placeholder="Enter new password"
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
-                                        className="pl-10 pr-10"
+                                        className="pl-10 pr-10 border-gray-400"
                                         required
                                     />
                                     <button
