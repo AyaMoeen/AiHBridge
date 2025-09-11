@@ -23,6 +23,10 @@ import MySavedPost from "./pages/MySavedPost";
 import MyPost from "./pages/MyPost";
 import Header from "./components/Header";
 import Rightbar from "./components/RightBar";
+import AboutUsPage from "./pages/AboutusPage";
+import ContactUsPage from "./pages/ContactusPage";
+import ProfilePage from "./pages/ProfilePages";
+import CreatePostPage from "./pages/CreatePostPage";
 function Layout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
 
@@ -33,9 +37,9 @@ function Layout({ children }: { children: React.ReactNode }) {
         <Header />
         <div className="flex flex-1 p-4">
           <main className="flex-1 flex justify-center">
-            <div className="w-full max-w-3xl flex flex-col items-center">{children}</div>
+            <div className="w-full max-w-4xl flex flex-col items-center">{children}</div>
           </main>
-          <Rightbar />
+         <Rightbar/>  
         </div>
       </div>
     </div>
@@ -63,6 +67,10 @@ function App() {
                 <Route path="/posts/:id" element={<PostDetails />} />
                 <Route path="/saved" element={<MySavedPost />} />
                 <Route path="/my-posts" element={<MyPost />} />
+                <Route path="/aboutUs" element={<AboutUsPage />} />
+                <Route path="/contactUs" element={<ContactUsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/create-post" element={<CreatePostPage />} />
               </Routes>
             </Layout>
           </SidebarProvider>

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,16 @@ export default function Header() {
             <Moon className="h-6 w-6" />
           )}
         </Button>
-        <Button className="hover:cursor-pointer bg-secondary-foreground font-serif text-gray-500 hover:bg-gray-200 rounded">
-          About us
+        <Button className="hover:cursor-pointer  bg-secondary-foreground font-serif text-gray-500 hover:bg-gray-200 rounded">
+          <Link to="/aboutUs">
+            About us
+          </Link>
+
         </Button>
         <Button className="hover:cursor-pointer bg-secondary-foreground font-serif text-gray-500 hover:bg-gray-200 rounded">
-          Contact us
+          <Link to="/contactUs">
+            Contact us
+          </Link>
         </Button>
         {user ? (
           <Button
