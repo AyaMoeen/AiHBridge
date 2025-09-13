@@ -27,7 +27,6 @@ class AccountViewSet(viewsets.ViewSet):
         user = authenticate(request, username=email, password=password)
         if user is None:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
-<<<<<<< Updated upstream
         token, _ = Token.objects.get_or_create(user=user)
         return Response({"token": token.key})
 
@@ -42,40 +41,6 @@ class AccountViewSet(viewsets.ViewSet):
         data['token'] = token.key
         return Response(data, status=status.HTTP_201_CREATED)
 
-=======
-
-        token, _ = Token.objects.get_or_create(user=user)
-
-        # Return token + user info
-        user_data = {
-            "id": user.id,
-            "name": user.get_full_name() or user.username,
-            "email": user.email,
-            "username": user.username,
-            "profile_picture": getattr(user, "profile_picture", None),
-            "bio": getattr(user, "bio", None),
-            "interests": getattr(user, "interests", []),
-            "created_at": user.date_joined.isoformat()
-       } 
-
-        return Response({
-           "token": token.key,
-           "user": user_data
-       }) 
-
-
-
-    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
-    def register(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token, _ = Token.objects.get_or_create(user=user)
-        data = serializer.data
-        data['token'] = token.key
-        return Response(data, status=status.HTTP_201_CREATED)
-
->>>>>>> Stashed changes
     @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def logout(self, request):
         request.user.auth_token.delete()
@@ -95,7 +60,6 @@ class AccountViewSet(viewsets.ViewSet):
             user.save()
             send_reset_code_email(user, code)
 
-        # Return success message even if email does not exist for security
         return Response({"message": "If this email exists, a verification code has been sent."})
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
