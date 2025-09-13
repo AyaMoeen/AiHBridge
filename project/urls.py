@@ -24,6 +24,8 @@ urlpatterns = [
     path("posts/", include("posts.urls")),
     path('search/', include("search.urls")),
     path('interactions/', include("interactions.urls")),
+    path("follows/", include("follows.urls")),
+    path('notifications/', include("notifications.urls")),
     path('admin/', admin.site.urls),
     path('profiles/', include('profiles.urls')),
 ]
