@@ -2,23 +2,32 @@
 import axios, { AxiosResponse } from 'axios';
 import { User } from '@/context/AuthContext';
 
-const API_BASE_URL = "";
-const USE_MOCK_API = ""; // Use mock if no API URL provided
+const API_BASE_URL = "http://127.0.0.1:8000";
+const USE_MOCK_API = false; // Set to false to use real API
 
 // Token management utilities
 const TOKEN_KEY = 'authToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
+const USER_KEY = 'user';
 
 const tokenManager = {
     getAccessToken: (): string | null => sessionStorage.getItem(TOKEN_KEY),
     getRefreshToken: (): string | null => sessionStorage.getItem(REFRESH_TOKEN_KEY),
+    getUser: (): User | null => {
+        const userStr = sessionStorage.getItem(USER_KEY);
+        return userStr ? JSON.parse(userStr) : null;
+    },
     setTokens: (accessToken: string, refreshToken: string): void => {
         sessionStorage.setItem(TOKEN_KEY, accessToken);
         sessionStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     },
+    setUser: (user: User): void => {
+        sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+    },
     clearTokens: (): void => {
         sessionStorage.removeItem(TOKEN_KEY);
         sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+        sessionStorage.removeItem(USER_KEY);
     },
     hasValidTokens: (): boolean => {
         return !!(tokenManager.getAccessToken() && tokenManager.getRefreshToken());
@@ -38,7 +47,7 @@ api.interceptors.request.use(
     (config) => {
         const token = tokenManager.getAccessToken();
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Token ${token}`;
         }
         return config;
     },
@@ -56,17 +65,10 @@ api.interceptors.response.use(
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            try {
-                // Try to refresh token
-                const newAccessToken = await authService.refreshToken();
-                originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                return api(originalRequest);
-            } catch (refreshError) {
-                // Refresh failed, redirect to login
-                tokenManager.clearTokens();
-                window.location.href = '/login';
-                return Promise.reject(refreshError);
-            }
+            // Clear tokens and redirect to login for Django API
+            tokenManager.clearTokens();
+            window.location.href = '/login';
+            return Promise.reject(error);
         }
 
         return Promise.reject(error);
@@ -74,152 +76,89 @@ api.interceptors.response.use(
 );
 
 export interface LoginResponse {
-    access_token: string;
-    refresh_token: string;
-    user: User;
+    token: string;
+    user: {
+        id: number;
+        username: string;
+        email: string;
+        name: string;
+        profile_picture?: string;
+        bio?: string;
+        interests?: string[];
+        created_at: string;
+    };
     message?: string;
 }
 
 export interface RegisterResponse {
-    access_token?: string;
-    refresh_token?: string;
-    user: User;
+    token?: string;
+    id: number;
+    username: string;
+    email: string;
+    name: string;
+    created_at: string;
     message: string;
 }
 
-export interface RefreshTokenResponse {
-    access_token: string;
-    refresh_token: string;
+export interface PasswordResetResponse {
+    message: string;
+    reset_token?: string;
 }
 
 export interface ApiError {
-    message: string;
+    message?: string;
+    error?: string;
     errors?: Record<string, string[]>;
+    detail?: string;
+    non_field_errors?: string[];
 }
-
-// Mock API data for development
-const mockUsers: User[] = [
-    {
-        id: '1',
-        name: 'John Doe',
-        email: 'john@example.com',
-        profile_picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-        bio: 'AI enthusiast and developer',
-        interests: ['Programming', 'Design', 'Business'],
-        created_at: '2024-01-01T00:00:00Z',
-        // updated_at: '2024-01-01T00:00:00Z',
-    }
-];
-
-// Mock password (in real app, this would be hashed)
-const mockPassword = 'password123';
-
-// Mock API functions
-const mockApi = {
-    async login(email: string, password: string): Promise<LoginResponse> {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const user = mockUsers.find(u => u.email === email);
-
-        if (!user || password !== mockPassword) {
-            throw new Error('Invalid credentials');
-        }
-
-        return {
-            access_token: `mock_access_token_${Date.now()}`,
-            refresh_token: `mock_refresh_token_${Date.now()}`,
-            user,
-            message: 'Login successful'
-        };
-    },
-
-    async register(name: string, email: string, _password: string): Promise<RegisterResponse> {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        // Check if user already exists
-        if (mockUsers.find(u => u.email === email)) {
-            throw new Error('User with this email already exists');
-        }
-
-        const newUser: User = {
-            id: String(mockUsers.length + 1),
-            name,
-            email,
-            created_at: new Date().toISOString(),
-            // updated_at: new Date().toISOString(),
-        };
-
-        mockUsers.push(newUser);
-
-        return {
-            access_token: `mock_access_token_${Date.now()}`,
-            refresh_token: `mock_refresh_token_${Date.now()}`,
-            user: newUser,
-            message: 'Registration successful'
-        };
-    },
-
-    async getCurrentUser(): Promise<User> {
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const token = tokenManager.getAccessToken();
-        if (!token) {
-            throw new Error('No access token');
-        }
-
-        // In mock API, return first user
-        return mockUsers[0];
-    },
-
-    async refreshToken(): Promise<RefreshTokenResponse> {
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        const refreshToken = tokenManager.getRefreshToken();
-        if (!refreshToken) {
-            throw new Error('No refresh token');
-        }
-
-        return {
-            access_token: `mock_access_token_${Date.now()}`,
-            refresh_token: `mock_refresh_token_${Date.now()}`
-        };
-    }
-};
 
 class AuthService {
     async login(email: string, password: string): Promise<LoginResponse> {
         try {
             if (USE_MOCK_API) {
-                return await mockApi.login(email, password);
+                // Mock implementation (keeping existing mock code)
+                throw new Error('Mock API not implemented for Django backend');
             }
 
-            const response: AxiosResponse<LoginResponse> = await api.post('/auth/login/', {
-                email,
+            const response: AxiosResponse<LoginResponse> = await api.post('/accounts/login/', {
+                username: email, // Django backend expects username field
                 password,
             });
 
             return response.data;
         } catch (error: any) {
-            if (USE_MOCK_API && error.message) {
-                throw error;
-            }
-
             if (error.response?.data) {
                 const apiError: ApiError = error.response.data;
-                throw new Error(apiError.message || 'Invalid credentials');
+                const errorMessage =
+                    apiError.detail ||
+                    apiError.message ||
+                    apiError.error ||
+                    (apiError.non_field_errors && apiError.non_field_errors[0]) ||
+                    'Invalid credentials';
+                throw new Error(errorMessage);
             }
             throw new Error('Network error. Please check your connection.');
         }
     }
 
-    async register(name: string, email: string, password: string): Promise<RegisterResponse> {
+    async register(
+        name: string,
+        email: string,
+        password: string,
+        username?: string
+    ): Promise<RegisterResponse> {
         try {
             if (USE_MOCK_API) {
-                return await mockApi.register(name, email, password);
+                throw new Error('Mock API not implemented for Django backend');
             }
 
-            const response: AxiosResponse<RegisterResponse> = await api.post('/auth/register/', {
+            // Generate username from email if not provided
+            const finalUsername =
+                username || email.split('@')[0] + Math.random().toString(36).substr(2, 5);
+
+            const response: AxiosResponse<RegisterResponse> = await api.post('/accounts/register/', {
+                username: finalUsername,
                 name,
                 email,
                 password,
@@ -227,8 +166,14 @@ class AuthService {
 
             return response.data;
         } catch (error: any) {
-            if (USE_MOCK_API && error.message) {
-                throw error;
+            console.log('Full error object:', error);
+
+            // Log the response if exists
+            if (error.response) {
+                console.log('API response:', error.response);
+                console.log('Response data:', error.response.data);
+                console.log('Response status:', error.response.status);
+                console.log('Response headers:', error.response.headers);
             }
 
             if (error.response?.data) {
@@ -237,44 +182,46 @@ class AuthService {
                 // Handle validation errors
                 if (apiError.errors) {
                     const firstError = Object.values(apiError.errors)[0];
-                    throw new Error(firstError[0] || 'Registration failed');
+                    throw new Error(Array.isArray(firstError) ? firstError[0] : firstError);
                 }
 
-                throw new Error(apiError.message || 'Registration failed');
+                const errorMessage =
+                    apiError.detail ||
+                    apiError.message ||
+                    apiError.error ||
+                    (apiError.non_field_errors && apiError.non_field_errors[0]) ||
+                    'Registration failed';
+                throw new Error(errorMessage);
             }
+
             throw new Error('Network error. Please check your connection.');
         }
     }
 
+
+
     async getCurrentUser(): Promise<User> {
         try {
             if (USE_MOCK_API) {
-                return await mockApi.getCurrentUser();
+                throw new Error('Mock API not implemented for Django backend');
+            }
+            const storedUser = tokenManager.getUser();
+            if (storedUser) {
+                return storedUser;
             }
 
-            const response: AxiosResponse<User> = await api.get('/auth/user/');
-            return response.data;
+            // If no stored user, we need to get it from the token or make an API call
+            // For now, throw an error to trigger re-login
+            throw new Error('No user data available');
         } catch (error: any) {
-            if (USE_MOCK_API && error.message) {
-                throw error;
-            }
-
-            if (error.response?.data) {
-                const apiError: ApiError = error.response.data;
-                throw new Error(apiError.message || 'Failed to get user data');
-            }
-            throw new Error('Network error. Please check your connection.');
+            throw new Error('Failed to get user data');
         }
     }
 
     async logout(): Promise<void> {
         try {
             if (!USE_MOCK_API) {
-                await api.post('/auth/logout/');
-            }
-            // Simulate API delay for mock
-            else {
-                await new Promise(resolve => setTimeout(resolve, 300));
+                await api.post('/accounts/logout/');
             }
         } catch (error) {
             // Even if logout fails on server, we clear local tokens
@@ -284,91 +231,80 @@ class AuthService {
         }
     }
 
-    async refreshToken(): Promise<string> {
-        try {
-            let response: RefreshTokenResponse;
-
-            if (USE_MOCK_API) {
-                response = await mockApi.refreshToken();
-            } else {
-                const refreshToken = tokenManager.getRefreshToken();
-                if (!refreshToken) {
-                    throw new Error('No refresh token available');
-                }
-
-                const apiResponse: AxiosResponse<RefreshTokenResponse> = await api.post('/auth/refresh/', {
-                    refresh_token: refreshToken
-                });
-                response = apiResponse.data;
-            }
-
-            // Update stored tokens
-            tokenManager.setTokens(response.access_token, response.refresh_token);
-            return response.access_token;
-
-        } catch (error: any) {
-            tokenManager.clearTokens();
-            throw new Error('Session expired. Please login again.');
-        }
-    }
-
-    async requestPasswordReset(email: string): Promise<void> {
+    async requestPasswordReset(email: string): Promise<PasswordResetResponse> {
         try {
             if (USE_MOCK_API) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                return;
+                return { message: 'Password reset email sent successfully' };
             }
 
-            await api.post('/auth/password-reset/', { email });
+            const response: AxiosResponse<PasswordResetResponse> = await api.post('/accounts/password_reset/', {
+                email
+            });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data) {
                 const apiError: ApiError = error.response.data;
-                throw new Error(apiError.message || 'Failed to send reset email');
+                const errorMessage =
+                    apiError.detail ||
+                    apiError.message ||
+                    apiError.error ||
+                    'Failed to send reset email';
+                throw new Error(errorMessage);
             }
             throw new Error('Network error. Please check your connection.');
         }
     }
 
-    async verifyResetCode(email: string, code: string): Promise<void> {
+    async verifyResetCode(code: string): Promise<{ reset_token: string }> {
         try {
             if (USE_MOCK_API) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                // Mock validation - accept any 6-digit code
                 if (code.length !== 6 || !/^\d{6}$/.test(code)) {
                     throw new Error('Invalid verification code');
                 }
-                return;
+                return { reset_token: 'mock_reset_token' };
             }
 
-            await api.post('/auth/verify-reset-code/', {
-                email,
+            const response: AxiosResponse<{ reset_token: string }> = await api.post('/accounts/password_reset_confirm_code/', {
                 code,
             });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data) {
                 const apiError: ApiError = error.response.data;
-                throw new Error(apiError.message || 'Invalid verification code');
+                const errorMessage =
+                    apiError.detail ||
+                    apiError.message ||
+                    apiError.error ||
+                    'Invalid verification code';
+                throw new Error(errorMessage);
             }
             throw new Error('Network error. Please check your connection.');
         }
     }
 
-    async resetPassword(email: string, code: string, newPassword: string): Promise<void> {
+    async resetPassword(newPassword: string, confirmPassword: string, resetToken: string): Promise<void> {
         try {
             if (USE_MOCK_API) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 return;
             }
 
-            await api.post('/auth/reset-password/', {
-                email,
-                code,
-                password: newPassword,
+            await api.post('/accounts/password_reset_set_new_password/', {
+                new_password: newPassword,
+                confirm_password: confirmPassword,
+                reset_token: resetToken,
             });
         } catch (error: any) {
             if (error.response?.data) {
                 const apiError: ApiError = error.response.data;
-                throw new Error(apiError.message || 'Failed to reset password');
+                const errorMessage =
+                    apiError.detail ||
+                    apiError.message ||
+                    apiError.error ||
+                    'Failed to reset password';
+                throw new Error(errorMessage);
             }
             throw new Error('Network error. Please check your connection.');
         }
@@ -376,7 +312,7 @@ class AuthService {
 
     // Helper method to check if user is authenticated
     isAuthenticated(): boolean {
-        return tokenManager.hasValidTokens();
+        return tokenManager.hasValidTokens() && !!tokenManager.getUser();
     }
 
     // Helper method to get stored access token
@@ -387,6 +323,11 @@ class AuthService {
     // Helper method to get stored refresh token
     getRefreshToken(): string | null {
         return tokenManager.getRefreshToken();
+    }
+
+    // Helper method to get stored user
+    getUser(): User | null {
+        return tokenManager.getUser();
     }
 
     // Helper method to clear all tokens
