@@ -1,11 +1,12 @@
 // src/context/AuthContext.tsx
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { authService } from '../features/auth/services/authService';
+import { authService, tokenManager } from '../features/auth/services/authService';
 
 export interface User {
-    id: string;
+    id: number;
     name: string;
     email: string;
+    username?: string;
     profile_picture?: string;
     bio?: string;
     interests?: string[];
@@ -68,8 +69,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 
 interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<void>;
-    logout: () => void;
-    register: (name: string, email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+    register: (name: string, email: string, password: string, username?: string) => Promise<void>;
     clearError: () => void;
     refreshUser: () => Promise<void>;
 }
@@ -90,25 +91,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
             try {
                 const accessToken = authService.getAccessToken();
-                const refreshToken = authService.getRefreshToken();
+                const storedUser = authService.getUser();
 
-                if (accessToken && refreshToken) {
-                    // Try to get current user data
-                    try {
-                        const user = await authService.getCurrentUser();
-                        dispatch({ type: 'SET_USER', payload: user });
-                    } catch (error) {
-                        // If getting user fails, try to refresh token
-                        try {
-                            await authService.refreshToken();
-                            const user = await authService.getCurrentUser();
-                            dispatch({ type: 'SET_USER', payload: user });
-                        } catch (refreshError) {
-                            // Both failed, clear tokens and show login
-                            authService.clearTokens();
-                            dispatch({ type: 'SET_LOADING', payload: false });
-                        }
-                    }
+                if (accessToken && storedUser) {
+                    // Convert stored user to match our User interface
+                    const user: User = {
+                        id: storedUser.id,
+                        name: storedUser.name,
+                        email: storedUser.email,
+                        username: storedUser.username,
+                        profile_picture: storedUser.profile_picture,
+                        bio: storedUser.bio,
+                        interests: storedUser.interests,
+                        created_at: storedUser.created_at,
+                    };
+                    dispatch({ type: 'SET_USER', payload: user });
                 } else {
                     dispatch({ type: 'SET_LOADING', payload: false });
                 }
@@ -128,16 +125,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         try {
             const response = await authService.login(email, password);
+            // Store token and user data
+            console.log("response", response);
+            tokenManager.setTokens(response.token, response.token); // Django uses single token
+            // Convert response user to match our User interface
+            const user: User = {
+                id: response.user.id,
+                name: response.user.name,
+                email: response.user.email,
+                username: response.user.username,
+                profile_picture: response.user.profile_picture,
+                bio: response.user.bio,
+                created_at: response.user.created_at,
+            };
 
-            // Store tokens in sessionStorage
-            const tokenManager = await import('../features/auth/services/authService').then(m => m.tokenManager);
-            tokenManager.setTokens(response.access_token, response.refresh_token);
+            tokenManager.setUser(user);
+            dispatch({ type: 'SET_USER', payload: user });
 
-            // Set user in state
-            dispatch({ type: 'SET_USER', payload: response.user });
-
-            // Redirect to home or dashboard
-            window.location.href = '/';
+            // Don't redirect automatically - let the component handle it
         } catch (error: any) {
             dispatch({
                 type: 'SET_ERROR',
@@ -147,18 +152,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
-    const register = async (name: string, email: string, password: string): Promise<void> => {
+    const register = async (name: string, email: string, password: string, username?: string): Promise<void> => {
         dispatch({ type: 'SET_LOADING', payload: true });
         dispatch({ type: 'CLEAR_ERROR' });
 
         try {
-            const response = await authService.register(name, email, password);
+            const response = await authService.register(name, email, password, username);
 
             // Store tokens if registration includes auto-login
-            if (response.access_token && response.refresh_token) {
-                const tokenManager = await import('../features/auth/services/authService').then(m => m.tokenManager);
-                tokenManager.setTokens(response.access_token, response.refresh_token);
-                dispatch({ type: 'SET_USER', payload: response.user });
+            if (response.token) {
+                tokenManager.setTokens(response.token, response.token);
+
+                // Convert response user to match our User interface
+                const user: User = {
+                    id: response.id,
+                    name: response.name,
+                    email: response.email,
+                    username: response.username,
+                    created_at: response.created_at,
+                };
+
+                tokenManager.setUser(user);
+                dispatch({ type: 'SET_USER', payload: user });
             } else {
                 dispatch({ type: 'SET_LOADING', payload: false });
             }
@@ -171,10 +186,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
-    const logout = (): void => {
-        authService.clearTokens();
-        dispatch({ type: 'LOGOUT' });
-        window.location.href = '/login';
+    const logout = async (): Promise<void> => {
+        try {
+            await authService.logout();
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            dispatch({ type: 'LOGOUT' });
+        }
     };
 
     const clearError = (): void => {
@@ -187,7 +206,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             dispatch({ type: 'SET_USER', payload: user });
         } catch (error) {
             // If refresh fails, logout user
-            logout();
+            await logout();
         }
     };
 

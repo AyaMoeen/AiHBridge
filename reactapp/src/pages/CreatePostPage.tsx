@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, PlusCircle, CheckCircle, AlertCircle, Star, Wand2, Globe, Plus } from "lucide-react";
+import { ArrowLeft, PlusCircle, CheckCircle, AlertCircle, Wand2, Globe } from "lucide-react";
 
 export default function CreatePostPage() {
     const navigate = useNavigate();
@@ -47,20 +47,6 @@ export default function CreatePostPage() {
                 ? prev.categories.filter((c) => c !== category)
                 : [...prev.categories, category],
         }));
-    };
-
-    const addNewCategory = () => {
-        if (formData.newCategory.trim() && !categories.includes(formData.newCategory.trim())) {
-            setFormData((prev) => ({
-                ...prev,
-                categories: [...prev.categories, formData.newCategory.trim()],
-                newCategory: "",
-            }));
-        }
-    };
-
-    const handleRatingClick = (rating: number) => {
-        setFormData((prev) => ({ ...prev, rating }));
     };
 
     const handleSubmit = async () => {
@@ -167,40 +153,7 @@ export default function CreatePostPage() {
                                 </Button>
                             ))}
                         </div>
-                        <div className="flex gap-2 mt-3">
-                            <Input
-                                placeholder="Add new category"
-                                value={formData.newCategory}
-                                onChange={(e) => handleInputChange("newCategory", e.target.value)}
-                                className="border-gray-200"
-                            />
-                            <Button type="button" onClick={addNewCategory} variant="secondary">
-                                <Plus className="w-4 h-4" />
-                            </Button>
-                        </div>
                     </div>
-
-                    {/* Rating */}
-                    <div>
-                        <Label>Your Rating *</Label>
-                        <div className="flex items-center gap-1 mt-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    type="button"
-                                    onClick={() => handleRatingClick(star)}
-                                    className="p-1 "
-                                >
-                                    <Star
-                                        className={`w-6 h-6 ${star <= formData.rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-                                            }`}
-                                    />
-                                </button>
-                            ))}
-                            <span className="ml-2 text-sm">{formData.rating > 0 ? `${formData.rating}/5` : "No rating"}</span>
-                        </div>
-                    </div>
-
                     {/* Opinion */}
                     <div>
                         <Label htmlFor="opinion">Your Opinion</Label>

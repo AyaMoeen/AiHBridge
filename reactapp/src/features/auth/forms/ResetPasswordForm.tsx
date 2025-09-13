@@ -1,99 +1,101 @@
+// src/features/auth/forms/ResetPasswordForm.tsx
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
+import { GalleryVerticalEnd, AlertCircle, Loader2, CheckCircle, Eye, EyeOff } from "lucide-react"
+import { useState, useEffect } from "react"
 import { authService } from "../services/authService"
-import { Lock, Eye, EyeOff, Loader2, CheckCircle, Check, X, GalleryVerticalEnd } from "lucide-react"
-import { validatePassword, getPasswordRequirements, getPasswordStrengthLabel, getPasswordStrengthColor } from "@/utils/passwordValidation"
 
 export function ResetPasswordForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
-    const [newPassword, setNewPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [showNewPassword, setShowNewPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-    const [isLoading, setIsLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
-    const [error, setError] = useState("")
     const navigate = useNavigate()
     const location = useLocation()
-    const { email, code } = location.state || {}
+    const email = location.state?.email || ''
+    const resetToken = location.state?.resetToken || ''
 
-    const passwordStrength = validatePassword(newPassword)
-    const passwordRequirements = getPasswordRequirements(newPassword)
-    const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0
-    const isFormValid = passwordStrength.isValid && passwordsMatch
+    const [formData, setFormData] = useState({
+        newPassword: '',
+        confirmPassword: ''
+    })
+    const [showPassword, setShowPassword] = useState({
+        newPassword: false,
+        confirmPassword: false
+    })
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState(false)
 
-    // Redirect if no email/code
     useEffect(() => {
-        if (!email || !code) {
-            navigate("/forgot-password")
+        if (!email || !resetToken) {
+            navigate('/forgot-password')
         }
-    }, [email, code, navigate])
+    }, [email, resetToken, navigate])
+
+    const validatePassword = (password: string) => {
+        if (password.length < 8) {
+            return 'Password must be at least 8 characters long'
+        }
+        return ''
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!isFormValid) {
-            setError("Please ensure all requirements are met and passwords match")
+        setError('')
+
+        // Validate passwords
+        const passwordError = validatePassword(formData.newPassword)
+        if (passwordError) {
+            setError(passwordError)
+            return
+        }
+
+        if (formData.newPassword !== formData.confirmPassword) {
+            setError('Passwords do not match')
             return
         }
 
         setIsLoading(true)
-        setError("")
 
         try {
-            await authService.resetPassword(email, code, newPassword)
-            setIsSuccess(true)
+            await authService.resetPassword(
+                formData.newPassword,
+                formData.confirmPassword,
+                resetToken
+            )
+            setSuccess(true)
             // Navigate to login page after 3 seconds
             setTimeout(() => {
-                navigate("/login")
+                navigate('/login')
             }, 3000)
-        } catch (error: unknown) {
-            setError((error as Error).message || "Failed to reset password. Please try again.")
+        } catch (err: any) {
+            setError(err.message || 'Failed to reset password')
         } finally {
             setIsLoading(false)
         }
     }
 
-    if (isSuccess) {
+    if (success) {
         return (
             <div className={cn("flex flex-col gap-6", className)} {...props}>
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-center gap-2">
-                            <GalleryVerticalEnd className="size-6" />
-                            <CardTitle className="text-center text-xl">AIHBridge</CardTitle>
+                            <CheckCircle className="size-6 text-green-500" />
+                            <CardTitle className="text-center text-xl">Password Reset Successfully</CardTitle>
                         </div>
-                        <CardDescription>
-                            Password reset successfully
+                        <CardDescription className="text-center">
+                            Your password has been updated successfully
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex flex-col items-center gap-4 py-8">
-                            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                                <CheckCircle className="w-8 h-8 text-green-600" />
-                            </div>
-                            <div className="text-center">
-                                <h3 className="font-semibold text-lg mb-2">Password Reset!</h3>
-                                <p className="text-muted-foreground text-sm">
-                                    Your password has been successfully reset.
-                                </p>
-                                <p className="text-muted-foreground text-sm mt-2">
-                                    Redirecting to login page...
-                                </p>
-                            </div>
-                        </div>
+                        <p className="text-sm text-gray-600 text-center">
+                            Redirecting to login page...
+                        </p>
                     </CardContent>
                 </Card>
             </div>
@@ -104,127 +106,72 @@ export function ResetPasswordForm({
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-center text-xl" >Reset New Password</CardTitle>
+                    <div className="flex items-center justify-center gap-2">
+                        <GalleryVerticalEnd className="size-6" />
+                        <CardTitle className="text-center text-xl">Reset Password</CardTitle>
+                    </div>
                     <CardDescription>
-                        Create a strong password for your account
+                        Enter your new password for {email}
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {error && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
+                            <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                            <p className="text-sm text-red-700">{error}</p>
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-6">
-                            {/* New Password */}
                             <div className="grid gap-3">
                                 <Label htmlFor="newPassword">New Password</Label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         id="newPassword"
-                                        type={showNewPassword ? "text" : "password"}
+                                        type={showPassword.newPassword ? "text" : "password"}
                                         placeholder="Enter new password"
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="pl-10 pr-10 border-gray-400"
+                                        className="border-gray-200 pr-10"
+                                        value={formData.newPassword}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            newPassword: e.target.value
+                                        }))}
+                                        disabled={isLoading}
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                        onClick={() => setShowNewPassword(!showNewPassword)}
-                                    >
-                                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                    </button>
+                                
                                 </div>
-
-                                {/* Password Strength Indicator */}
-                                {newPassword && (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-muted-foreground">Password strength:</span>
-                                            <span className={`font-medium ${passwordStrength.score <= 1 ? 'text-red-600' :
-                                                passwordStrength.score === 2 ? 'text-orange-600' :
-                                                    passwordStrength.score === 3 ? 'text-yellow-600' :
-                                                        'text-green-600'
-                                                }`}>
-                                                {getPasswordStrengthLabel(passwordStrength.score)}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-muted rounded-full h-2">
-                                            <div
-                                                className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthColor(passwordStrength.score)}`}
-                                                data-width={passwordStrength.score}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Password Requirements */}
-                                {newPassword && (
-                                    <div className="space-y-1">
-                                        {passwordRequirements.map((requirement, index) => (
-                                            <div key={index} className="flex items-center gap-2 text-sm">
-                                                {requirement.met ? (
-                                                    <Check className="h-3 w-3 text-green-600" />
-                                                ) : (
-                                                    <X className="h-3 w-3 text-muted-foreground" />
-                                                )}
-                                                <span className={requirement.met ? "text-green-600" : "text-muted-foreground"}>
-                                                    {requirement.label}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                <p className="text-xs text-gray-500">
+                                    Password must be at least 8 characters long
+                                </p>
                             </div>
 
-                            {/* Confirm Password */}
                             <div className="grid gap-3">
-                                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <Label htmlFor="confirmPassword">Confirm New Password</Label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
                                         id="confirmPassword"
-                                        type={showConfirmPassword ? "text" : "password"}
+                                        type={showPassword.confirmPassword ? "text" : "password"}
                                         placeholder="Confirm new password"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="pl-10 pr-10"
+                                        className="border-gray-200 pr-10"
+                                        value={formData.confirmPassword}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            confirmPassword: e.target.value
+                                        }))}
+                                        disabled={isLoading}
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    >
-                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                    </button>
+                             
                                 </div>
-
-                                {/* Password Match Indicator */}
-                                {confirmPassword && (
-                                    <div className="flex items-center gap-2 text-sm">
-                                        {passwordsMatch ? (
-                                            <Check className="h-3 w-3 text-green-600" />
-                                        ) : (
-                                            <X className="h-3 w-3 text-red-600" />
-                                        )}
-                                        <span className={passwordsMatch ? "text-green-600" : "text-red-600"}>
-                                            {passwordsMatch ? "Passwords match" : "Passwords do not match"}
-                                        </span>
-                                    </div>
-                                )}
                             </div>
-
-                            {error && (
-                                <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                                    {error}
-                                </div>
-                            )}
 
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={isLoading || !isFormValid}
+                                    disabled={isLoading}
                                 >
                                     {isLoading ? (
                                         <>
@@ -232,18 +179,20 @@ export function ResetPasswordForm({
                                             Resetting Password...
                                         </>
                                     ) : (
-                                        "Reset Password"
+                                        'Reset Password'
                                     )}
                                 </Button>
                             </div>
                         </div>
+
                         <div className="mt-4 text-center text-sm">
                             <button
                                 type="button"
-                                onClick={() => navigate("/verify-code", { state: { email, code } })}
-                                className="underline underline-offset-4 hover:text-primary"
+                                onClick={() => navigate("/login")}
+                                className="underline underline-offset-4 text-blue-600 hover:text-blue-800"
+                                disabled={isLoading}
                             >
-                                ← Back to verification
+                                Back to login
                             </button>
                         </div>
                     </form>
