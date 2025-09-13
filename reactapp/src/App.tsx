@@ -2,49 +2,30 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
 } from "react-router-dom";
+
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./hooks/useAuth";
-import "./index.css";
-
-import { AppSidebar } from "./components/app-sidebar";
 import { SidebarProvider } from "./components/ui/sidebar";
 
+
 import LoginPage from "./features/auth/pages/LoginPage";
+import SignupPage from "./features/auth/pages/SignupPage";
 import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
 import VerificationPage from "./features/auth/pages/VerificationPage";
 import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage";
+
 import HomePage from "./pages/HomePage";
-import PostDetails from "./pages/PostDetails";
-import SingUp from "./pages/SingUp";
-import MySavedPost from "./pages/MySavedPost";
-import MyPost from "./pages/MyPost";
-import Header from "./components/Header";
-import Rightbar from "./components/RightBar";
 import AboutUsPage from "./pages/AboutusPage";
 import ContactUsPage from "./pages/ContactusPage";
 import ProfilePage from "./pages/ProfilePages";
+import MySavedPost from "./pages/MySavedPost";
+import MyPost from "./pages/MyPost";
 import CreatePostPage from "./pages/CreatePostPage";
-function Layout({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-
-  return (
-    <div className="flex min-h-screen w-full">
-      <AppSidebar />
-      <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
-        <Header />
-        <div className="flex flex-1 p-4">
-          <main className="flex-1 flex justify-center">
-            <div className="w-full max-w-4xl flex flex-col items-center">{children}</div>
-          </main>
-         <Rightbar/>  
-        </div>
-      </div>
-    </div>
-  );
-}
+import PostDetails from "./pages/PostDetails";
+import AuthLayout from "./components/layout/AuthLayout";
+import MainLayout from "./components/layout/MainLayout";
+import { ProtectedRoute } from "./components/common/ProtectedRoute";
 
 function App() {
   return (
@@ -52,27 +33,136 @@ function App() {
       <AuthProvider>
         <Router>
           <SidebarProvider>
-            <Layout>
-              <Routes>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<SingUp />} />
-                <Route
-                  path="/forgot-password"
-                  element={<ForgotPasswordPage />}
-                />
-                <Route path="/verify-code" element={<VerificationPage />} />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
-                <Route path="*" element={<Navigate to="/" replace />} />
-                <Route path="/" element={<HomePage />} />
-                <Route path="/posts/:id" element={<PostDetails />} />
-                <Route path="/saved" element={<MySavedPost />} />
-                <Route path="/my-posts" element={<MyPost />} />
-                <Route path="/aboutUs" element={<AboutUsPage />} />
-                <Route path="/contactUs" element={<ContactUsPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/create-post" element={<CreatePostPage />} />
-              </Routes>
-            </Layout>
+            <Routes>
+              {/* Public routes with AuthLayout */}
+              <Route
+                path="/login"
+                element={
+                  <AuthLayout>
+                    <LoginPage />
+                  </AuthLayout>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <AuthLayout>
+                    <SignupPage />
+                  </AuthLayout>
+                }
+              />
+              <Route
+                path="/forgot-password"
+                element={
+                  <AuthLayout>
+                    <ForgotPasswordPage />
+                  </AuthLayout>
+                }
+              />
+              <Route
+                path="/verify-code"
+                element={
+                  <AuthLayout>
+                    <VerificationPage />
+                  </AuthLayout>
+                }
+              />
+              <Route
+                path="/reset-password"
+                element={
+                  <AuthLayout>
+                    <ResetPasswordPage />
+                  </AuthLayout>
+                }
+              />
+
+              {/* Main routes with MainLayout */}
+              <Route
+                path="/"
+                element={
+                  <MainLayout>
+                    <HomePage />
+                  </MainLayout>
+                }
+              />
+              <Route
+                path="/aboutUs"
+                element={
+                  <MainLayout>
+                    <AboutUsPage />
+                  </MainLayout>
+                }
+              />
+              <Route
+                path="/contactUs"
+                element={
+                  <MainLayout>
+                    <ContactUsPage />
+                  </MainLayout>
+                }
+              />
+              {/* Protected routes */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <ProfilePage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/posts/:id"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <PostDetails />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-posts"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <MyPost />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/saved"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <MySavedPost />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create-post"
+                element={
+                  <ProtectedRoute>
+                    <MainLayout>
+                      <CreatePostPage />
+                    </MainLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Fallback */}
+              <Route
+                path="*"
+                element={
+                  <MainLayout>
+                    <HomePage />
+                  </MainLayout>
+                }
+              />
+            </Routes>
           </SidebarProvider>
         </Router>
       </AuthProvider>
