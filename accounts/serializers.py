@@ -4,6 +4,11 @@ from django.contrib.auth.hashers import make_password
 
 User = get_user_model()
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "name", "username", "email"]  
+        
 class RegisterSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(source='date_joined', read_only=True)
  
