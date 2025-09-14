@@ -38,7 +38,11 @@ const customIcons = [
   },
 ];
 
-export default function RatingFaces() {
+interface RatingFacesProps {
+  onSelect?: (value: number) => void;
+}
+
+export default function RatingFaces({ onSelect }: RatingFacesProps) {
   const [rating, setRating] = useState(0);
 
   return (
@@ -46,8 +50,11 @@ export default function RatingFaces() {
       {customIcons.map(({ value, icon, label }) => (
         <button
           key={value}
-          onClick={() => setRating(value)}
           title={label}
+          onClick={() => {
+            setRating(value);
+            if (onSelect) onSelect(value);
+          }}
           className={`transition-transform ${
             rating === value ? "scale-125" : "opacity-70"
           }`}
