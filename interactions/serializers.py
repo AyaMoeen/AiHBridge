@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import Reaction, Comment, Bookmark, Rating
 
-
-
 class ReactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reaction
