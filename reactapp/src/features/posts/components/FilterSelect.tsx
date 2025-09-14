@@ -8,27 +8,26 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 
-const categories = [
-  { value: "all-categories", label: "All Categories" },
-  { value: "video_audio", label: "Video / Audio" },
-  { value: "coding_development", label: "Coding / Development" },
-  { value: "AI", label: "AI" },
-];
-
 interface FilterSelectProps {
-  value: string[];
-  onChange: (value: string[]) => void;
+  value: number[];
+  onChange: (value: number[]) => void;
+  categories: { id: number; name: string }[];
 }
 
-export default function FilterSelect({ value, onChange }: FilterSelectProps) {
+export default function FilterSelect({
+  value,
+  onChange,
+  categories,
+}: FilterSelectProps) {
   const handleSelect = (selected: string) => {
-    if (!value.includes(selected)) {
-      onChange([...value, selected]);
+    const selectedId = Number(selected);
+    if (!value.includes(selectedId)) {
+      onChange([...value, selectedId]);
     }
   };
 
-  const handleRemove = (removed: string) => {
-    onChange(value.filter((v) => v !== removed));
+  const handleRemove = (removedId: number) => {
+    onChange(value.filter((id) => id !== removedId));
   };
 
   return (
@@ -40,27 +39,27 @@ export default function FilterSelect({ value, onChange }: FilterSelectProps) {
         <SelectContent className="bg-[var(--card)] text-[var(--card-foreground)] rounded-lg shadow-lg">
           {categories.map((cat) => (
             <SelectItem
-              key={cat.value}
-              value={cat.value}
-              disabled={value.includes(cat.value)}
+              key={cat.id}
+              value={cat.id.toString()}
+              disabled={value.includes(cat.id)}
               className="hover:bg-[var(--accent)] hover:text-[var(--accent-foreground)] transition-colors duration-150"
             >
-              {cat.label}
+              {cat.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       <div className="flex flex-wrap gap-2">
-        {value.map((badge) => (
+        {value.map((id) => (
           <Badge
-            key={badge}
+            key={id}
             className="flex items-center gap-2 px-3 py-1"
             variant="secondary"
           >
-            {categories.find((c) => c.value === badge)?.label || badge}
+            {categories.find((c) => c.id === id)?.name || id}
             <button
-              onClick={() => handleRemove(badge)}
+              onClick={() => handleRemove(id)}
               className="ml-1 rounded hover:bg-muted"
             >
               <X size={14} />

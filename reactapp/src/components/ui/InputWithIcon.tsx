@@ -13,23 +13,23 @@ const InputWithIcon = React.forwardRef<HTMLInputElement, InputWithIconProp>(
     return (
       <div
         className={cn(
-          "flex items-center gap-2 border rounded-sm w-full",
+          "flex items-center gap-2 border rounded-sm w-full border border-gray-400",
           bgColor,
           className
         )}
         style={{ padding: "5px" }}
       >
-        {icon1 && <span>{icon1}</span>}
+        {icon1 && <span className="pl-1">{icon1}</span>}
         <input
           type={type}
           ref={ref}
           {...props}
           className={cn(
-            "border-none bg-transparent outline-none text-[black] border-input w-full",
+            "placeholder:text-sm border-none bg-muted outline-none text-[black] w-full ",
             className
           )}
         />
-        {icon2 && <span>{icon2}</span>}
+        {icon2 && <span className="pl-1">{icon2}</span>}
       </div>
     );
   }

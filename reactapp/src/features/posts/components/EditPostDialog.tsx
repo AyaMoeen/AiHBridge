@@ -8,9 +8,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FilterSelect from "./FilterSelect";
-
+import {
+  categoryService,
+  Category,
+} from "@/features/posts/services/categoryService";
 interface EditPostDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -18,13 +21,13 @@ interface EditPostDialogProps {
   initialDescription: string;
   initialUrl: string;
   initialReview: string;
-  initialBadges: string[];
+  initialBadges: { id: number; name: string }[];
   onSave: (data: {
     title: string;
     description: string;
-    shareUrl: string;
-    review: string;
-    badges: string[];
+    link: string;
+    personal_review: string;
+    badges: { id: number; name: string }[];
   }) => void;
 }
 
@@ -40,12 +43,40 @@ export default function EditPostDialog({
 }: EditPostDialogProps) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState(initialDescription);
-  const [shareUrl, setUrl] = useState(initialUrl);
-  const [review, setReview] = useState(initialReview);
-  const [badges, setBadges] = useState<string[]>(initialBadges);
+  const [link, setUrl] = useState(initialUrl);
+  const [personal_review, setReview] = useState(initialReview);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  useEffect(() => {
+    setSelectedCategories(initialBadges.map((b) => b.id));
+  }, [initialBadges]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [categoriesData] = await Promise.all([
+          categoryService.getCategories(),
+        ]);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSave = () => {
-    onSave({ title, description, shareUrl, review, badges });
+    const selectedBadges = categories.filter((c) =>
+      selectedCategories.includes(c.id)
+    );
+    onSave({
+      title,
+      description,
+      link,
+      personal_review,
+      badges: selectedBadges,
+    });
     onOpenChange(false);
   };
 
@@ -78,7 +109,7 @@ export default function EditPostDialog({
             <Input
               type="url"
               placeholder="Post URL"
-              value={shareUrl}
+              value={link}
               onChange={(e) => setUrl(e.target.value)}
               className="w-full rounded border border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] shadow-sm hover:shadow-md transition-shadow duration-200 "
             />
@@ -87,7 +118,11 @@ export default function EditPostDialog({
             <label className="text-sm font-bold mb-1 text-foreground">
               Categories
             </label>
-            <FilterSelect value={badges} onChange={setBadges} />
+            <FilterSelect
+              value={selectedCategories}
+              onChange={setSelectedCategories}
+              categories={categories}
+            />
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-bold mb-1 text-foreground">
@@ -110,7 +145,7 @@ export default function EditPostDialog({
             </label>
             <Textarea
               placeholder="Post review"
-              value={review}
+              value={personal_review}
               onChange={(e) => {
                 setReview(e.target.value);
                 e.target.style.height = "auto";
