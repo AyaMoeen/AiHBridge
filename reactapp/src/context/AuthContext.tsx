@@ -125,24 +125,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         try {
             const response = await authService.login(email, password);
-            // Store token and user data
-            console.log("response", response);
-            tokenManager.setTokens(response.token, response.token); // Django uses single token
-            // Convert response user to match our User interface
-            const user: User = {
-                id: response.user.id,
-                name: response.user.name,
-                email: response.user.email,
-                username: response.user.username,
-                profile_picture: response.user.profile_picture,
-                bio: response.user.bio,
-                created_at: response.user.created_at,
-            };
+
+            // Store token
+            tokenManager.setTokens(response.token, response.token); // single token for both
+
+            // Fetch user profile after login
+            const user = await authService.getCurrentUser();
 
             tokenManager.setUser(user);
             dispatch({ type: 'SET_USER', payload: user });
-
-            // Don't redirect automatically - let the component handle it
         } catch (error: any) {
             dispatch({
                 type: 'SET_ERROR',
@@ -151,6 +142,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             throw error;
         }
     };
+
 
     const register = async (name: string, email: string, password: string, username?: string): Promise<void> => {
         dispatch({ type: 'SET_LOADING', payload: true });
