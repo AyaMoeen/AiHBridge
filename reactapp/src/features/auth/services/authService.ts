@@ -77,16 +77,6 @@ api.interceptors.response.use(
 
 export interface LoginResponse {
     token: string;
-    user: {
-        id: number;
-        username: string;
-        email: string;
-        name: string;
-        profile_picture?: string;
-        bio?: string;
-        interests?: string[];
-        created_at: string;
-    };
     message?: string;
 }
 
@@ -116,16 +106,10 @@ export interface ApiError {
 class AuthService {
     async login(email: string, password: string): Promise<LoginResponse> {
         try {
-            if (USE_MOCK_API) {
-                // Mock implementation (keeping existing mock code)
-                throw new Error('Mock API not implemented for Django backend');
-            }
-
             const response: AxiosResponse<LoginResponse> = await api.post('/accounts/login/', {
-                username: email, // Django backend expects username field
+                username: email, // Django expects username or email as username field
                 password,
             });
-
             return response.data;
         } catch (error: any) {
             if (error.response?.data) {
@@ -202,22 +186,14 @@ class AuthService {
 
     async getCurrentUser(): Promise<User> {
         try {
-            if (USE_MOCK_API) {
-                throw new Error('Mock API not implemented for Django backend');
-            }
-            const storedUser = tokenManager.getUser();
-            if (storedUser) {
-                return storedUser;
-            }
-
-            // If no stored user, we need to get it from the token or make an API call
-            // For now, throw an error to trigger re-login
-            throw new Error('No user data available');
+            const response: AxiosResponse<User> = await api.get('/profiles/'); // <-- Adjust endpoint
+            const user = response.data;
+            tokenManager.setUser(user);
+            return user;
         } catch (error: any) {
-            throw new Error('Failed to get user data');
+            throw new Error('Failed to fetch user profile');
         }
     }
-
     async logout(): Promise<void> {
         try {
             if (!USE_MOCK_API) {
