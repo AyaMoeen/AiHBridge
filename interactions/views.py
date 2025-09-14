@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from .serializers import ReactionSerializer, CommentSerializer, BookmarkSerializer, RatingSerializer
 from .mixins import PostMixin
 from . import services
+from accounts.serializers import UserSerializer
 
 class InteractionViewSet(PostMixin, viewsets.ViewSet):
     """
@@ -60,3 +61,30 @@ class InteractionViewSet(PostMixin, viewsets.ViewSet):
 
     def get_post_by_id(self, pk):
         return self.get_post(pk)  
+
+    @action(detail=True, methods=['get'])
+    def likes(self, request, pk=None):
+        post = self.get_post_by_id(pk)
+        reactions = post.reactions.select_related("user")
+        data = UserSerializer([r.user for r in reactions], many=True).data
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'])
+    def comments(self, request, pk=None):
+        post = self.get_post_by_id(pk)
+        comments = post.comments.select_related("user")
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'])
+    def bookmarks(self, request):
+        bookmarks = request.user.bookmarks.select_related("post")
+        serializer = BookmarkSerializer(bookmarks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def liked(self, request):
+        reactions = request.user.reactions.values_list("post_id", flat=True)
+        return Response({"liked_posts": list(reactions)}, status=status.HTTP_200_OK)
+
+
