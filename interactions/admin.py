@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Reaction, Comment, Bookmark, Rating
+from .models import Reaction, Comment, Rating
 
 
 @admin.register(Reaction)
@@ -18,12 +18,12 @@ class CommentAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 
-@admin.register(Bookmark)
-class BookmarkAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "post", "added_at")
-    search_fields = ("user__email", "post__title")
-    list_filter = ("added_at",)
-    ordering = ("-added_at",)
+#@admin.register(Bookmark)
+#class BookmarkAdmin(admin.ModelAdmin):
+ #   list_display = ("id", "user", "post", "added_at")
+  #  search_fields = ("user__email", "post__title")
+   # list_filter = ("added_at",)
+    #ordering = ("-added_at",)
 
 
 @admin.register(Rating)

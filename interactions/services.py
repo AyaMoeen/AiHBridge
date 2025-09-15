@@ -1,4 +1,4 @@
-from .models import Reaction, Bookmark, Rating
+from .models import Reaction, Rating
 
 def like_post(user, post):
     return Reaction.objects.get_or_create(user=user, post=post)
@@ -10,15 +10,15 @@ def unlike_post(user, post):
         return True
     return False
 
-def bookmark_post(user, post):
-    return Bookmark.objects.get_or_create(user=user, post=post)
+#def bookmark_post(user, post):
+ #   return Bookmark.objects.get_or_create(user=user, post=post)
 
-def unbookmark_post(user, post):
-    bookmark = Bookmark.objects.filter(user=user, post=post).first()
-    if bookmark:
-        bookmark.delete()
-        return True
-    return False
+#def unbookmark_post(user, post):
+ #   bookmark = Bookmark.objects.filter(user=user, post=post).first()
+  #  if bookmark:
+   #     bookmark.delete()
+    #    return True
+    #return False
 
 def rate_post(user, post, value):
     if Rating.objects.filter(user=user, post=post).exists():

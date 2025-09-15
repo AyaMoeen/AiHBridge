@@ -19,7 +19,6 @@ class ProfileViewSet(viewsets.ViewSet):
 
     def get_queryset(self):
         return Profile.objects.select_related('user').prefetch_related('interested_categories')
-       # return Profile.objects.select_related('user')
 
     def list(self, request):
         """

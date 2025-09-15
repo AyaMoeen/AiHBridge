@@ -2,15 +2,6 @@ from rest_framework import serializers
 from .models import Post, Category
 from django.db.models import Avg
 
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -45,7 +36,7 @@ class PostSerializer(serializers.ModelSerializer):
         'avg_rating'
         ]
 
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'username', 'name', 'profile_picture',]
         
     def to_representation(self, instance):
         """Add avg_rating dynamically from related Ratings"""

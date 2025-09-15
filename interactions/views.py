@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from .serializers import ReactionSerializer, CommentSerializer, BookmarkSerializer, RatingSerializer
+from .serializers import ReactionSerializer, CommentSerializer, RatingSerializer
 from .mixins import PostMixin
 from . import services
 from accounts.serializers import UserSerializer
@@ -35,19 +35,19 @@ class InteractionViewSet(PostMixin, viewsets.ViewSet):
         serializer.save(user=request.user, post=post)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['post'])
-    def bookmark(self, request, pk=None):
-        post = self.get_post_by_id(pk)
-        bookmark, created = services.bookmark_post(request.user, post)
-        serializer = BookmarkSerializer(bookmark)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #@action(detail=True, methods=['post'])
+    #def bookmark(self, request, pk=None):
+     #   post = self.get_post_by_id(pk)
+      #  bookmark, created = services.bookmark_post(request.user, post)
+       # serializer = BookmarkSerializer(bookmark)
+        #return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['delete'])
-    def unbookmark(self, request, pk=None):
-        post = self.get_post_by_id(pk)
-        if services.unbookmark_post(request.user, post):
-            return Response({"detail": "Removed from bookmarks"}, status=status.HTTP_204_NO_CONTENT)
-        return Response({"detail": "You have not bookmarked this post"}, status=status.HTTP_400_BAD_REQUEST)
+    #@action(detail=True, methods=['delete'])
+    #def unbookmark(self, request, pk=None):
+     #   post = self.get_post_by_id(pk)
+      #  if services.unbookmark_post(request.user, post):
+       #     return Response({"detail": "Removed from bookmarks"}, status=status.HTTP_204_NO_CONTENT)
+        #return Response({"detail": "You have not bookmarked this post"}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def rate(self, request, pk=None):
@@ -76,11 +76,11 @@ class InteractionViewSet(PostMixin, viewsets.ViewSet):
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=['get'])
-    def bookmarks(self, request):
-        bookmarks = request.user.bookmarks.select_related("post")
-        serializer = BookmarkSerializer(bookmarks, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    #@action(detail=False, methods=['get'])
+    #def bookmarks(self, request):
+     #   bookmarks = request.user.bookmarks.select_related("post")
+      #  serializer = BookmarkSerializer(bookmarks, many=True)
+       # return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def liked(self, request):

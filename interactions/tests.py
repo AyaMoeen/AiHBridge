@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from accounts.models import User
 from posts.models import Post, Category
-from interactions.models import Reaction, Comment, Bookmark, Rating
+from interactions.models import Reaction, Comment, Rating
 from django.conf import settings
 
 def create_user(email="user@example.com", password="123456", name="Test User"):
@@ -65,24 +65,24 @@ class CommentTest(InteractionAPITestSetup):
         self.assertTrue(Comment.objects.filter(user=self.user, post=self.post, text="Nice post!").exists())
 
 
-class BookmarkTest(InteractionAPITestSetup):
-    def test_bookmark_post(self):
-        url = reverse("interactions:interaction-bookmark", args=[self.post.id])
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Bookmark.objects.filter(user=self.user, post=self.post).exists())
+#class BookmarkTest(InteractionAPITestSetup):
+ #   def test_bookmark_post(self):
+  #      url = reverse("interactions:interaction-bookmark", args=[self.post.id])
+   #     response = self.client.post(url)
+    #    self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+     #   self.assertTrue(Bookmark.objects.filter(user=self.user, post=self.post).exists())
 
-    def test_unbookmark_post(self):
-        Bookmark.objects.create(user=self.user, post=self.post)
-        url = reverse("interactions:interaction-unbookmark", args=[self.post.id])
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertFalse(Bookmark.objects.filter(user=self.user, post=self.post).exists())
+    #def test_unbookmark_post(self):
+     #   Bookmark.objects.create(user=self.user, post=self.post)
+      #  url = reverse("interactions:interaction-unbookmark", args=[self.post.id])
+       # response = self.client.delete(url)
+        #self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        #self.assertFalse(Bookmark.objects.filter(user=self.user, post=self.post).exists())
 
-    def test_unbookmark_without_bookmark(self):
-        url = reverse("interactions:interaction-unbookmark", args=[self.post.id])
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    #def test_unbookmark_without_bookmark(self):
+     #   url = reverse("interactions:interaction-unbookmark", args=[self.post.id])
+      #  response = self.client.delete(url)
+       # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class RatingTest(InteractionAPITestSetup):
