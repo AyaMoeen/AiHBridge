@@ -22,16 +22,16 @@ class Comment(models.Model):
     def __str__(self):
         return f"Comment by {self.user} on {self.post}"
 
-class Bookmark(models.Model):
-    user: models.ForeignKey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookmarks")
-    post: models.ForeignKey = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="bookmarked_by")
-    added_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
+#class Bookmark(models.Model):
+ #   user: models.ForeignKey = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookmarks")
+  #  post: models.ForeignKey = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="bookmarked_by")
+   # added_at: models.DateTimeField = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ("user", "post")  
+    #class Meta:
+     #   unique_together = ("user", "post")  
 
-    def __str__(self):
-        return f"{self.user} bookmarked {self.post}"
+    #def __str__(self):
+     #   return f"{self.user} bookmarked {self.post}"
 
 class Rating(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="ratings")

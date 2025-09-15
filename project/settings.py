@@ -50,6 +50,7 @@ INSTALLED_APPS: list[str] = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'profiles',
+    'SavedLists'
 ]
 
 REST_FRAMEWORK = {
