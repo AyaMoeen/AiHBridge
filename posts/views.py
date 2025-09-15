@@ -3,32 +3,22 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Post, Category
 from .serializers import PostSerializer, CategorySerializer
+from .services import PostRankingService
 
 # Permissions management
 class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    السماح فقط لصاحب البوست يعدل أو يحذف،
-    لكن باقي المستخدمين يقدروا يشوفوا البوست.
-    """
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.user == request.user
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API للعرض فقط للكاتيجوريز.
-    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
 
 class PostViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet لإدارة البوستات: 
-    عرض الكل، عرض بوست محدد، إنشاء، تعديل، حذف،
-    عرض البوستات الخاصة بالمستخدم، وعدد البوستات.
-    """
+
     serializer_class = PostSerializer
     queryset = Post.objects.all()  # dummy, actual filtered in get_queryset
 
@@ -41,9 +31,6 @@ class PostViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-        """
-        Permissions مختلفة حسب نوع الـ action.
-        """
         if self.action in ["list", "retrieve"]:
             permission_classes = [permissions.AllowAny]
         elif self.action == "create":
@@ -59,17 +46,20 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def my_posts(self, request):
-        """
-        عرض البوستات الخاصة بالمستخدم الحالي.
-        """
         posts = self.get_queryset().filter(user=request.user)
         serializer = self.get_serializer(posts, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"])
     def my_posts_count(self, request):
-        """
-        يرجع عدد البوستات الخاصة بالمستخدم الحالي.
-        """
         count = self.get_queryset().filter(user=request.user).count()
         return Response({"my_posts_count": count}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"])
+    def top_posts(self, request):
+        """
+        GET /posts/top_posts/ → ترجع البوستات الأكثر شعبية
+        """
+        posts = PostRankingService.get_top_posts()
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
