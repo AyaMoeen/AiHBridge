@@ -28,6 +28,8 @@ urlpatterns = [
     path('notifications/', include("notifications.urls")),
     path('admin/', admin.site.urls),
     path('profiles/', include('profiles.urls')),
+    path('savedlists/', include('SavedLists.urls')),
+        
 ]
 
 if settings.DEBUG:
