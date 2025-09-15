@@ -18,12 +18,14 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     def mark_all_read(self, request):
         qs = self.get_queryset().filter(read=False)
         qs.update(read=True)
-        return Response({"detail": "All marked read."}, status=status.HTTP_200_OK)
-
+        serializer = self.get_serializer(self.get_queryset(), many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
     @action(detail=True, methods=["post"])
     def mark_read(self, request, pk=None):
         notification = self.get_queryset().filter(pk=pk).first()
         if not notification:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         notification.mark_read()
-        return Response({"detail": "Marked read."}, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(notification, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
