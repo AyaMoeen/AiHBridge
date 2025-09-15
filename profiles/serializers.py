@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Profile
 from posts.models import Category
-from posts.serializers import CategorySerializer
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source="user.id", read_only=True)

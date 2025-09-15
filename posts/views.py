@@ -58,7 +58,7 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def top_posts(self, request):
         """
-        GET /posts/top_posts/ → ترجع البوستات الأكثر شعبية
+        GET /posts/top_posts/ 
         """
         posts = PostRankingService.get_top_posts()
         serializer = self.get_serializer(posts, many=True)
