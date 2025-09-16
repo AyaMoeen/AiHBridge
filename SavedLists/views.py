@@ -3,7 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import SavedList, SavedListItem
-from .serializers import SavedListSerializer, SavedListDetailSerializer, SavedListItemSerializer
+from .serializers import SavedListSerializer, SavedListDetailSerializer
 from posts.models import Post
 
 class SavedListViewSet(viewsets.ModelViewSet):
