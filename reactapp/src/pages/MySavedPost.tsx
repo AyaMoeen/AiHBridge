@@ -1,43 +1,35 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import FilterSelect from "@/features/posts/components/FilterSelect";
 import Post from "../features/posts/components/Post";
-import {
-  postService,
-  Post as PostType,
-} from "../features/posts/services/postService";
+import { SavedListWithItems } from "../features/posts/services/postService";
 import {
   categoryService,
   Category,
 } from "@/features/posts/services/categoryService";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bookmark, BookmarkCheck, List, ListCheck, ListChecks, ListChevronsDownUp } from "lucide-react";
-import { ListBulletIcon } from "@radix-ui/react-icons";
+import { ArrowLeft, BookmarkCheck } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useSaved } from "@/context/SavedContext";
 
 export default function MySavedPost() {
   const { id } = useParams();
-  const location = useLocation();
-  const { title, description, count_post } = (location.state || {}) as {
-    title?: string;
-    description?: string;
-    count_post: number;
-  };
+  const numericId = Number(id);
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [posts, setPosts] = useState<PostType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [listWithItems, setListWithItems] = useState<SavedListWithItems>();
+  const { getListWithItems } = useSaved();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsData, categoriesData] = await Promise.all([
-          postService.getPosts(),
+        const [categoriesData] = await Promise.all([
           categoryService.getCategories(),
         ]);
-
-        setPosts(postsData);
         setCategories(categoriesData);
       } catch (error) {
         console.error("Failed to fetch data", error);
@@ -49,14 +41,27 @@ export default function MySavedPost() {
     fetchData();
   }, []);
 
+  const fetchSavedList = useCallback(async () => {
+    if (!isAuthenticated || !numericId) return;
+    try {
+      const list = await getListWithItems(numericId);
+      setListWithItems(list);
+    } catch (err) {
+      console.error("Failed to fetch saved list:", err);
+    }
+  }, [isAuthenticated, numericId, getListWithItems]);
+
+  useEffect(() => {
+    fetchSavedList();
+  }, [fetchSavedList]);
   const filteredPosts =
     selectedCategories.length === 0
-      ? posts
-      : posts.filter((post) =>
+      ? listWithItems?.items || []
+      : listWithItems?.items.filter((post) =>
           selectedCategories.every((catId) =>
             post.categories?.some((c) => c.id === catId)
           )
-        );
+        ) || [];
 
   if (loading) return <p>Loading...</p>;
 
@@ -75,12 +80,16 @@ export default function MySavedPost() {
       <div className="w-full mb-4">
         <div className="flex flex-row items-center gap-2 mb-2">
           <BookmarkCheck size={24} className="text-gray-400" />
-          <h1 className="text-2xl font-bold">{title || "My Saved Tools"}</h1>
+          <h1 className="text-2xl font-bold">
+            {listWithItems?.name || "My Saved Tools"}
+          </h1>
         </div>
 
-        {description && <p className="text-gray-500">{description}</p>}
+        {listWithItems?.description && (
+          <p className="text-gray-500">{listWithItems?.description}</p>
+        )}
         <Badge className="rounded text-[10px] bg-muted text-secondary hover:bg-muted">
-          {count_post} posts saved
+          {listWithItems?.items.length} posts saved
         </Badge>
       </div>
 

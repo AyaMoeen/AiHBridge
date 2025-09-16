@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { ScreenShare, Star, Trash2 } from "lucide-react";
 import { SquarePen } from "lucide-react";
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
   onEditClick?: () => void;
   showDelete?: boolean;
   onDeleteClick?: () => void;
+  create_at: string;
 }
 export default function PostHeader({
   name,
@@ -23,6 +25,7 @@ export default function PostHeader({
   avg_rating,
   link,
   title,
+  create_at,
   showEdit = false,
   onEditClick,
   showDelete = false,
@@ -49,6 +52,7 @@ export default function PostHeader({
               {username}
             </span>
           </div>
+          <div className="text-sm font-semibold text-gray-500">• {formatRelativeTime(create_at)}</div>
         </div>
         <div className="flex items-center gap-4">
           <a href={link} target="_blank" rel="noopener noreferrer">

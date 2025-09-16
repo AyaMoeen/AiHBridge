@@ -38,6 +38,8 @@ export default function Post({
   showDelete,
   onDeleteClick,
 }: Props) {
+
+  
   const [postData, setPostData] = useState({
     id: post.id,
     author: post.user,
@@ -51,6 +53,7 @@ export default function Post({
     comment_count: post.comment_count,
     name: post.name,
     username: post.username,
+    created_at: post.created_at
   });
 
   const [editOpen, setEditOpen] = useState(false);
@@ -98,6 +101,7 @@ export default function Post({
           avg_rating={postData.avg_rating}
           username={postData.username}
           name={postData.name}
+          create_at={postData.created_at}
         />
 
         <PostContent

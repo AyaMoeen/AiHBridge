@@ -7,16 +7,20 @@ import {
   Post as PostType,
 } from "../features/posts/services/postService";
 import { useNavigate } from "react-router-dom";
+
 export default function HighlightedTool() {
-  const [posts, setPosts] = useState<PostType[]>([]);
+
+  const [highLightTool, setHighLightTool] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsData] = await Promise.all([postService.getPosts()]);
-
-        setPosts(postsData);
+        const [postsData] = await Promise.all([
+          postService.getHighlightedTools(),
+        ]);
+        setHighLightTool(postsData);
       } catch (error) {
         console.error("Failed to fetch data", error);
       } finally {
@@ -26,6 +30,7 @@ export default function HighlightedTool() {
 
     fetchData();
   }, []);
+  
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -34,8 +39,13 @@ export default function HighlightedTool() {
         <h2 className="flex items-center gap-2 font-semibold text-yellow-500 mb-3">
           <Star className="w-5 h-5" /> Highlighted Tools
         </h2>
-        <ul className="space-y-4">
-          {posts.slice(0, 3).map((tool, index) => (
+        <ul
+          className="max-h-70 overflow-y-auto pr-2 space-y-4"
+          style={{
+            scrollbarWidth: "none",
+          }}
+        >
+          {highLightTool.map((tool, index) => (
             <li
               key={tool.id}
               className={`flex items-center justify-between text-sm hover:cursor-pointer hover:text-accent-foreground cursor-pointer animate-fade-in`}

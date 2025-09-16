@@ -1,11 +1,13 @@
 import { CardFooter } from "@/components/ui/card";
 import { Heart, MessageCircle, BookmarkPlus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import RatingDialog from "./RatingDialog";
 import { useAuth } from "@/hooks/useAuth";
 import RequireLoginDialog from "@/components/common/RequireLoginDialog";
 import SaveListDialog from "@/components/SaveListDialog";
 import { postService } from "@/features/posts/services/postService";
+import { useNavigate } from "react-router-dom";
+import { useSaved } from "@/context/SavedContext";
 
 interface props {
   like_count: number;
@@ -17,6 +19,7 @@ export default function PostFooter({
   comment_count,
   postId,
 }: props) {
+  
   const { isAuthenticated } = useAuth();
   const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -24,20 +27,43 @@ export default function PostFooter({
   const [commentCount] = useState(comment_count);
   const [open, setOpen] = useState(false);
   const [showRequireLogin, setShowRequireLogin] = useState(false);
+  const { unbookmark } = useSaved();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchLiked = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const likedPosts = await postService.getLikedPosts();
+        setLiked(likedPosts.includes(postId));
+      } catch (err) {
+        console.error("Failed to fetch liked posts:", err);
+      }
+    };
+    fetchLiked();
+  }, [isAuthenticated, postId]);
+
   const handleLike = async () => {
     if (!isAuthenticated) {
       setShowRequireLogin(true);
       return;
     }
     try {
-      const res = await postService.likePost(postId);
-      console.log("Like response:", res);
-      setLiked((prev) => !prev);
-      setLikeCount((prev) => (liked ? prev - 1 : prev + 1));
+      if (liked) {
+        await postService.unlikePost(postId);
+        setLiked(false);
+        setLikeCount((prev) => prev - 1);
+      } else {
+        await postService.likePost(postId);
+        setLiked(true);
+        setLikeCount((prev) => prev + 1);
+      }
     } catch (error) {
       console.error("Failed to like/unlike post:", error);
     }
   };
+
   const handleRate = async (value: number) => {
     if (!isAuthenticated) {
       setShowRequireLogin(true);
@@ -48,6 +74,38 @@ export default function PostFooter({
       console.log("Rate response:", res);
     } catch (err) {
       console.error("Failed to rate post:", err);
+    }
+  };
+
+  useEffect(() => {
+    const checkSaved = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const savedLists = await postService.getSavedLists();
+        const defaultList = savedLists.find((list) => list.is_default);
+        if (!defaultList) return;
+        const listWithItems = await postService.getSavedListWithItems(
+          defaultList.id
+        );
+        setSaved(listWithItems.items.some((item) => item.id === postId));
+      } catch (err) {
+        console.error("Failed to fetch saved status:", err);
+      }
+    };
+    checkSaved();
+  }, [isAuthenticated, postId]);
+
+
+  const handleBookmark = async () => {
+    if (!isAuthenticated) {
+      setShowRequireLogin(true);
+      return;
+    }
+    if (saved) {
+      await unbookmark(postId);
+      setSaved(false);
+    } else {
+      setOpen(true);
     }
   };
 
@@ -74,7 +132,7 @@ export default function PostFooter({
                   setShowRequireLogin(true);
                   return;
                 }
-                console.log("Open comments");
+                navigate(`/posts/${postId}`);
               }}
               className="h-5 w-5 text-muted-foreground cursor-pointer hover:text-primary hover:scale-110 transition"
             />
@@ -91,14 +149,7 @@ export default function PostFooter({
         </div>
         <div>
           <BookmarkPlus
-            onClick={() => {
-              if (!isAuthenticated) {
-                setShowRequireLogin(true);
-                return;
-              }
-              setOpen(true);
-              setSaved(true);
-            }}
+            onClick={handleBookmark}
             className={`h-5 w-5 cursor-pointer transition-transform duration-200 hover:scale-110 
             ${
               saved
@@ -110,6 +161,7 @@ export default function PostFooter({
             open={open}
             onOpenChange={setOpen}
             onSave={() => setSaved(true)}
+            postId={postId}
           />
         </div>
       </CardFooter>
