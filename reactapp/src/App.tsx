@@ -24,6 +24,8 @@ import MainLayout from "./components/layout/MainLayout";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
 import SignupPage from "./features/auth/pages/SignUpPage";
 import SavedPage from "./pages/SavedPage";
+import MySavedPost from "./pages/MySavedPost";
+import { SavedProvider } from "@/context/SavedContext";
 
 function App() {
   return (
@@ -32,138 +34,150 @@ function App() {
         <Router>
           <SidebarProvider>
             <SearchProvider>
-              <Routes>
-                <Route
-                  path="/login"
-                  element={
-                    <AuthLayout>
-                      <LoginPage />
-                    </AuthLayout>
-                  }
-                />
-                <Route
-                  path="/register"
-                  element={
-                    <AuthLayout>
-                      <SignupPage />
-                    </AuthLayout>
-                  }
-                />
-                <Route
-                  path="/forgot-password"
-                  element={
-                    <AuthLayout>
-                      <ForgotPasswordPage />
-                    </AuthLayout>
-                  }
-                />
-                <Route
-                  path="/verify-code"
-                  element={
-                    <AuthLayout>
-                      <VerificationPage />
-                    </AuthLayout>
-                  }
-                />
-                <Route
-                  path="/reset-password"
-                  element={
-                    <AuthLayout>
-                      <ResetPasswordPage />
-                    </AuthLayout>
-                  }
-                />
+              <SavedProvider>
+                <Routes>
+                  <Route
+                    path="/login"
+                    element={
+                      <AuthLayout>
+                        <LoginPage />
+                      </AuthLayout>
+                    }
+                  />
+                  <Route
+                    path="/register"
+                    element={
+                      <AuthLayout>
+                        <SignupPage />
+                      </AuthLayout>
+                    }
+                  />
+                  <Route
+                    path="/forgot-password"
+                    element={
+                      <AuthLayout>
+                        <ForgotPasswordPage />
+                      </AuthLayout>
+                    }
+                  />
+                  <Route
+                    path="/verify-code"
+                    element={
+                      <AuthLayout>
+                        <VerificationPage />
+                      </AuthLayout>
+                    }
+                  />
+                  <Route
+                    path="/reset-password"
+                    element={
+                      <AuthLayout>
+                        <ResetPasswordPage />
+                      </AuthLayout>
+                    }
+                  />
 
-                <Route
-                  path="/"
-                  element={
-                    <MainLayout>
-                      <HomePage />
-                    </MainLayout>
-                  }
-                />
-                <Route
-                  path="/search"
-                  element={
-                    <MainLayout>
-                      <SearchResults />
-                    </MainLayout>
-                  }
-                />
-                <Route
-                  path="/aboutUs"
-                  element={
-                    <MainLayout>
-                      <AboutUsPage />
-                    </MainLayout>
-                  }
-                />
-                <Route
-                  path="/contactUs"
-                  element={
-                    <MainLayout>
-                      <ContactUsPage />
-                    </MainLayout>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <ProtectedRoute>
+                  <Route
+                    path="/"
+                    element={
                       <MainLayout>
-                        <ProfilePage />
+                        <HomePage />
                       </MainLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/posts/:id"
-                  element={
-                    <MainLayout>
-                      <PostDetails />
-                    </MainLayout>
-                  }
-                />
-                <Route
-                  path="/my-posts"
-                  element={
-                    <ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/search"
+                    element={
                       <MainLayout>
-                        <MyPost />
+                        <SearchResults />
                       </MainLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/saved"
-                  element={
-                    <ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/aboutUs"
+                    element={
                       <MainLayout>
-                        <SavedPage />
+                        <AboutUsPage />
                       </MainLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/create-post"
-                  element={
-                    <ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/contactUs"
+                    element={
                       <MainLayout>
-                        <CreatePostPage />
+                        <ContactUsPage />
                       </MainLayout>
-                    </ProtectedRoute>
-                  }
-                />
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout>
+                          <ProfilePage />
+                        </MainLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/posts/:id"
+                    element={
+                      <MainLayout>
+                        <PostDetails />
+                      </MainLayout>
+                    }
+                  />
+                  <Route
+                    path="/my-posts"
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout>
+                          <MyPost />
+                        </MainLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/saved"
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout>
+                          <SavedPage />
+                        </MainLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/saved/:id"
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout>
+                          <MySavedPost />
+                        </MainLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/create-post"
+                    element={
+                      <ProtectedRoute>
+                        <MainLayout>
+                          <CreatePostPage />
+                        </MainLayout>
+                      </ProtectedRoute>
+                    }
+                  />
 
-                <Route
-                  path="*"
-                  element={
-                    <MainLayout>
-                      <HomePage />
-                    </MainLayout>
-                  }
-                />
-              </Routes>
+                  <Route
+                    path="*"
+                    element={
+                      <MainLayout>
+                        <HomePage />
+                      </MainLayout>
+                    }
+                  />
+                </Routes>
+              </SavedProvider>
             </SearchProvider>
           </SidebarProvider>
         </Router>

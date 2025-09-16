@@ -47,6 +47,34 @@ export interface RatingResponse {
   created_at: string;
   updated_at: string;
 }
+export interface Comment {
+  id: number;
+  user: number;
+  username: string;
+  name: string;
+  profile_picture: string | null;
+  post: number;
+  text: string;
+  created_at: string;
+}
+
+export interface SavedList {
+  id: number;
+  name: string;
+  description: string;
+  is_default: boolean;
+  created_at: string;
+  post_count: number;
+}
+
+export interface SavedListWithItems {
+  id: number;
+  name: string;
+  description: string;
+  is_default: boolean;
+  created_at: string;
+  items: Post[];
+}
 class PostService {
   async createPost(data: {
     title: string;
@@ -149,12 +177,24 @@ class PostService {
 
   async unlikePost(id: number): Promise<void> {
     try {
-      await api.post(`/interactions/posts/${id}/unlike/`);
+      await api.delete(`/interactions/posts/${id}/unlike/`);
     } catch (error) {
       console.error(`Failed to unlike post with id ${id}:`, error);
       throw error;
     }
   }
+  async getLikedPosts(): Promise<number[]> {
+    try {
+      const response: AxiosResponse<{ liked_posts: number[] }> = await api.get(
+        `/interactions/posts/liked/`
+      );
+      return response.data.liked_posts;
+    } catch (error) {
+      console.error("Failed to fetch liked posts:", error);
+      throw error;
+    }
+  }
+
   async ratePost(postId: number, value: number): Promise<RatingResponse> {
     try {
       const response: AxiosResponse<RatingResponse> = await api.post(
@@ -164,6 +204,110 @@ class PostService {
       return response.data;
     } catch (error) {
       console.error(`Failed to rate post with id ${postId}:`, error);
+      throw error;
+    }
+  }
+  async addComment(postId: number, text: string): Promise<Comment> {
+    try {
+      const response: AxiosResponse<Comment> = await api.post(
+        `/interactions/posts/${postId}/comment/`,
+        { text }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to add comment on post ${postId}:`, error);
+      throw error;
+    }
+  }
+  async getComments(postId: number): Promise<Comment[]> {
+    try {
+      const response: AxiosResponse<Comment[]> = await api.get(
+        `/interactions/posts/${postId}/comments/`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Failed to fetch comments for post ${postId}:`, error);
+      throw error;
+    }
+  }
+  async getTrendyTools(): Promise<Post[]> {
+    try {
+      const response: AxiosResponse<Post[]> = await api.get(`/posts/top_posts`);
+      return response.data;
+    } catch (error) {
+      console.error("Failt To Get Trendy", error);
+      throw error;
+    }
+  }
+  async getSavedLists(): Promise<SavedList[]> {
+    try {
+      const response: AxiosResponse<SavedList[]> = await api.get(
+        "/savedlists/"
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch saved lists:", error);
+      throw error;
+    }
+  }
+
+  async createSavedList(name: string, description: string): Promise<SavedList> {
+    try {
+      const response: AxiosResponse<SavedList> = await api.post(
+        "/savedlists/",
+        {
+          name,
+          description,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Faild to create list", error);
+      throw error;
+    }
+  }
+  async bookmarkPost(
+    postId: number,
+    listId: number
+  ): Promise<{ detail: string }> {
+    try {
+      const response = await api.post("/savedlists/bookmark/", {
+        post_id: postId,
+        saved_list_id: listId,
+      });
+      console.log("reponse", response);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to bookmark post:", error);
+      throw error;
+    }
+  }
+  async getSavedListWithItems(listId: number): Promise<SavedListWithItems> {
+    try {
+      const response = await api.get(`/savedlists/${listId}/`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch saved list with items:", error);
+      throw error;
+    }
+  }
+  async unbookmarkPost(postId: number): Promise<{ detail: string }> {
+    try {
+      const response = await api.delete("/savedlists/unbookmark/", {
+        data: { post_id: postId },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to unbookmark post:", error);
+      throw error;
+    }
+  }
+  async getHighlightedTools(): Promise<Post[]> {
+    try {
+      const response = await api.get("/profiles/highlighted-tools");
+      return response.data;
+    } catch (error) {
+      console.log("Faild to get HighlightedTools : ", error);
       throw error;
     }
   }
