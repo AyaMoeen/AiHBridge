@@ -4,12 +4,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Profile
 from .serializers import ProfileSerializer
-
-from posts.models import Category, Post
+from django.contrib.auth import get_user_model
+from posts.models import  Post
 from posts.serializers import PostSerializer
 from django.db.models import Count, Avg
 
 
+User = get_user_model()
 
 class ProfileViewSet(viewsets.ViewSet):
     """
@@ -55,3 +56,20 @@ class ProfileViewSet(viewsets.ViewSet):
         #'-likes_count', '-comments_count', 
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=["get"], url_path="details")
+    def profile_details(self, request, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+            profile = user.profile
+        except User.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ProfileSerializer(profile, context={"request": request})
+        posts = Post.objects.filter(user=user)
+        posts_serializer = PostSerializer(posts, many=True, context={"request": request})
+
+        return Response({
+            "profile": serializer.data,
+            "posts": posts_serializer.data
+        })
