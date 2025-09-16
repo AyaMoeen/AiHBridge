@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Bookmark, Plus } from "lucide-react";
 import { Textarea } from "./ui/textarea";
+import { useSaved } from "@/context/SavedContext";
 
 export interface SaveListDialogProps {
   open: boolean;
+  postId: number;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
 }
@@ -22,23 +24,52 @@ export default function SaveListDialog({
   open,
   onOpenChange,
   onSave,
+  postId,
 }: SaveListDialogProps) {
-  const [lists, setLists] = useState<string[]>([
-    "Coding Tools",
-    "Power Point Tools",
-  ]);
-  const [showInput, setShowInput] = useState(false);
-  const [newList, setNewList] = useState("");
 
-  const handleAddList = () => {
-    if (newList.trim() !== "") {
-      setLists((prev) => [...prev, newList.trim()]);
-      setNewList("");
+  const [description, setDescription] = useState("");
+  const [nameOfList, setNameOfList] = useState("");
+  const [showInput, setShowInput] = useState(false);
+  const [selectedLists, setSelectedLists] = useState<number[]>([]);
+  const { lists, createList, bookmark } = useSaved();
+
+  const handleAddList = async () => {
+    if (nameOfList.trim() === "") return;
+    try {
+      await createList(nameOfList.trim(), description);
+      setNameOfList("");
+      setDescription("");
       setShowInput(false);
       onSave();
+    } catch (err) {
+      console.error("Error creating list:", err);
     }
   };
 
+
+  const handleSaveBookmarks = async () => {
+    try {
+      let listsToSave = selectedLists;
+
+      if (listsToSave.length === 0) {
+        const defaultList = lists.find((l) => l.is_default);
+        if (defaultList) {
+          listsToSave = [defaultList.id];
+        }
+      }
+
+      for (const listId of listsToSave) {
+        await bookmark(postId, listId);
+      }
+      onSave();
+      onOpenChange(false);
+      setSelectedLists([]);
+    } catch (err) {
+      console.error("Failed to bookmark post:", err);
+    }
+  };
+
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md  p-6 bg-secondary-foreground">
@@ -67,20 +98,30 @@ export default function SaveListDialog({
           Available Lists
         </h3>
         <div className="space-y-2 max-h-60 overflow-y-auto mb-2 ml-1">
-          {lists.map((list, idx) => (
+          {lists.slice(1, lists.length).map((list, idx) => (
             <div
               key={idx}
               className="flex items-center gap-2 p-2 rounded hover:bg-muted  transition cursor-pointer"
             >
               <Checkbox
                 className="w-4 h-4 rounded border border-gray-500 checked:border-secondary transition-all cursor-pointer"
-                id={list.toLowerCase()}
+                id={list.id.toString()}
+                checked={selectedLists.includes(list.id)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedLists((prev) => [...prev, list.id]);
+                  } else {
+                    setSelectedLists((prev) =>
+                      prev.filter((id) => id !== list.id)
+                    );
+                  }
+                }}
               />
               <label
-                htmlFor={list.toLowerCase()}
+                htmlFor={list.id.toString()}
                 className="text-sm font-semibold text-muted-foreground  cursor-pointer"
               >
-                {list}
+                {list.name}
               </label>
             </div>
           ))}
@@ -91,8 +132,8 @@ export default function SaveListDialog({
             <div className="flex flex-col items-start justify-center mt-4">
               <label className="text-[12px] m-1">List name</label>
               <Input
-                value={newList}
-                onChange={(e) => setNewList(e.target.value)}
+                value={nameOfList}
+                onChange={(e) => setNameOfList(e.target.value)}
                 className="border border-border rounded bg-muted placeholder:text-[12px] border-gray-400"
                 placeholder="Enter name of list .... "
               />
@@ -100,6 +141,8 @@ export default function SaveListDialog({
             <div className="flex flex-col items-start justify-center">
               <label className="text-[12px] m-1">Desription (optimal)</label>
               <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 className="border border-border rounded bg-muted placeholder:text-[12px] border-gray-400"
                 placeholder="Enter description of list .... "
               />
@@ -139,7 +182,7 @@ export default function SaveListDialog({
           </Button>
           <Button
             className="flex-1 bg-secondary text-secondary-foreground hover:bg-secondary/80 transition rounded hover:cursor-pointer"
-            onClick={onSave}
+            onClick={handleSaveBookmarks}
           >
             Save
           </Button>

@@ -9,15 +9,16 @@ import {
 import { useNavigate } from "react-router-dom";
 
 export default function TrendingTools() {
-  const [posts, setPosts] = useState<PostType[]>([]);
+
+  const [trendyPost, setTrendyPost] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsData] = await Promise.all([postService.getPosts()]);
-
-        setPosts(postsData);
+        const [postsData] = await Promise.all([postService.getTrendyTools()]);
+        setTrendyPost(postsData);
       } catch (error) {
         console.error("Failed to fetch data", error);
       } finally {
@@ -27,6 +28,7 @@ export default function TrendingTools() {
 
     fetchData();
   }, []);
+  
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -35,8 +37,13 @@ export default function TrendingTools() {
         <h2 className="flex items-center gap-2 font-semibold text-primary mb-3">
           <TrendingUp className="w-5 h-5 text-primary" /> Trending Tools
         </h2>
-        <ul className="space-y-4">
-          {posts.slice(0, 3).map((tool, index) => (
+        <ul
+          className="max-h-70 overflow-y-auto pr-2 space-y-4 "
+          style={{
+            scrollbarWidth: "none",
+          }}
+        >
+          {trendyPost.map((tool, index) => (
             <li
               key={tool.id}
               className={`flex items-center justify-between text-sm `}
