@@ -9,6 +9,7 @@ import {
   EyeOff,
   AlertCircle,
   Loader2,
+  GalleryVerticalEnd,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -82,11 +83,11 @@ export default function SignUp() {
   };
 
   return (
-    <div className="bg-secondary-foreground border-2 border-gray-400 rounded-lg flex items-center justify-center flex-col w-full shadow-lg p-6 ">
-      <h1 className="text-lg font-bold">
-        Join <span className="bg-black text-white p-[5px] rounded">Ai</span>{" "}
-        HBridge
-      </h1>
+    <div className="bg-secondary-foreground border-2 border-gray-300 rounded-lg flex items-center justify-center flex-col w-full shadow-lg p-6 ">
+      <div className="flex flex-row gap-3">
+        <GalleryVerticalEnd className="size-6" />
+        <h1 className="text-lg font-bold">AIHBridge</h1>
+      </div>
       <p className="mt-2 text-[12px]">
         Create your account to get started with AiHBridge
       </p>
@@ -152,7 +153,6 @@ export default function SignUp() {
             if (error) clearError();
             setEmail(e.target.value);
           }}
-          
         />
         {formErrors.email && (
           <p className="text-xs text-red-500">{formErrors.email}</p>
@@ -234,7 +234,7 @@ export default function SignUp() {
       </div>
 
       <Button
-        className="w-full mt-6 bg-secondary rounded cursor-pointer"
+        className="w-full mt-6 bg-primary rounded cursor-pointer"
         size="lg"
         onClick={handleToSubmit}
         disabled={isLoading}
