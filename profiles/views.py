@@ -9,7 +9,6 @@ from posts.models import  Post
 from posts.serializers import PostSerializer
 from django.db.models import Count, Avg
 
-
 User = get_user_model()
 
 class ProfileViewSet(viewsets.ViewSet):
@@ -56,7 +55,7 @@ class ProfileViewSet(viewsets.ViewSet):
         #'-likes_count', '-comments_count', 
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=["get"], url_path="details")
     def profile_details(self, request, pk=None):
         try:

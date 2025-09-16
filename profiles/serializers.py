@@ -38,3 +38,4 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_following_count(self, obj):
         return Follow.objects.filter(follower=obj.user).count()
+
