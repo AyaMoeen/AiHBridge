@@ -16,7 +16,7 @@ interface Props {
     user: string;
     username: string;
     name: string;
-    profile_picture: string | null;
+    profile_picture?: string;
     like_count: number;
     comment_count: number;
     avg_rating: number;
@@ -38,8 +38,6 @@ export default function Post({
   showDelete,
   onDeleteClick,
 }: Props) {
-
-  
   const [postData, setPostData] = useState({
     id: post.id,
     author: post.user,
@@ -53,7 +51,8 @@ export default function Post({
     comment_count: post.comment_count,
     name: post.name,
     username: post.username,
-    created_at: post.created_at
+    created_at: post.created_at,
+    profile_picture: post.profile_picture,
   });
 
   const [editOpen, setEditOpen] = useState(false);
@@ -102,6 +101,7 @@ export default function Post({
           username={postData.username}
           name={postData.name}
           create_at={postData.created_at}
+          profile_picture={postData.profile_picture}
         />
 
         <PostContent
