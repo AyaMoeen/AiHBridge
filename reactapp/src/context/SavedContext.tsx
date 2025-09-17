@@ -6,6 +6,7 @@ import {
   SavedList,
   SavedListWithItems,
 } from "@/features/posts/services/postService";
+import { useAuth } from "./AuthContext";
 
 interface SavedContextType {
   lists: SavedList[];
@@ -23,7 +24,7 @@ const SavedContext = createContext<SavedContextType | undefined>(undefined);
 export const SavedProvider = ({ children }: { children: React.ReactNode }) => {
   const [lists, setLists] = useState<SavedList[]>([]);
   const [savedPostIds, setSavedPostIds] = useState<number[]>([]);
-
+  const { isAuthenticated } = useAuth();
   const fetchLists = async () => {
     try {
       const data = await postService.getSavedLists();
@@ -102,8 +103,14 @@ export const SavedProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLists([]);
+      setSavedPostIds([]);
+      return;
+    }
+
     fetchLists();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <SavedContext.Provider
