@@ -1,6 +1,10 @@
-from django.urls import path
-from .views import SummarizeView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import SummarizeViewSet
+
+router = DefaultRouter()
+router.register(r"summarize", SummarizeViewSet, basename="summarize")
 
 urlpatterns = [
-    path("summarize/", SummarizeView.as_view(), name="summarize"),
+    path("", include(router.urls)),
 ]

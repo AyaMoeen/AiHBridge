@@ -1,14 +1,24 @@
-from django.conf import settings
+import boto3
 import requests
 import time
+from django.conf import settings
 
 HUGGINGFACE_API_URL = settings.HUGGINGFACE_API
-API_TOKEN = settings.HF_API_TOKEN
 
-headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
+def get_huggingface_token() -> str:
+    """Read Hugging Face token from AWS Parameter Store (with decryption)."""
+    aws_client = boto3.client("ssm", region_name="us-east-1")
+    response = aws_client.get_parameter(
+        Name="/summarize/post", 
+        WithDecryption=True
+    )
+    return response["Parameter"]["Value"]
 
 def summarize_text(text: str) -> str:
+    """Summarize text using Hugging Face API with retries."""
+    token = get_huggingface_token()
+    headers = {"Authorization": f"Bearer {token}"}
     payload = {"inputs": text}
     
     for attempt in range(3): 

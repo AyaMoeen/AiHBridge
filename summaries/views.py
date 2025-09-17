@@ -1,11 +1,16 @@
-from rest_framework.views import APIView
+from rest_framework import viewsets, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import status
 from .serializers import SummarizeRequestSerializer
 from .services import summarize_text
 
-class SummarizeView(APIView):
-    def post(self, request):
+class SummarizeViewSet(viewsets.ViewSet):
+    permission_classes = [AllowAny]
+
+    def create(self, request):
+        """
+        POST /summaries/summarize/
+        """
         serializer = SummarizeRequestSerializer(data=request.data)
         if serializer.is_valid():
             text = serializer.validated_data["text"]
