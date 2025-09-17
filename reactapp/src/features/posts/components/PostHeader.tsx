@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
+import { Avatar } from "@radix-ui/react-avatar";
 import { ScreenShare, Star, Trash2 } from "lucide-react";
 import { SquarePen } from "lucide-react";
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   showDelete?: boolean;
   onDeleteClick?: () => void;
   create_at: string;
+  profile_picture?: string;
 }
 export default function PostHeader({
   name,
@@ -30,20 +32,18 @@ export default function PostHeader({
   onEditClick,
   showDelete = false,
   onDeleteClick,
+  profile_picture,
 }: Props) {
   return (
     <CardHeader className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-            {name
-              ? name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .slice(0, 2)
-                  .join("")
-              : "AU"}{" "}
-          </div>
+          <Avatar className="h-10 w-10">
+            <img
+              src={profile_picture}
+              className="w-9 h-9 rounded-full object-cover"
+            />
+          </Avatar>
           <div className="flex flex-col">
             <CardTitle className="text-sm font-semibold text-foreground">
               {name}
@@ -52,7 +52,9 @@ export default function PostHeader({
               {username}
             </span>
           </div>
-          <div className="text-sm font-semibold text-gray-500">• {formatRelativeTime(create_at)}</div>
+          <div className="text-sm font-semibold text-gray-500">
+            • {formatRelativeTime(create_at)}
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <a href={link} target="_blank" rel="noopener noreferrer">

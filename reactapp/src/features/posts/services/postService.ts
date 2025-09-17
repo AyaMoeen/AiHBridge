@@ -26,7 +26,7 @@ export interface Post {
   user: string;
   username: string;
   name: string;
-  profile_picture: string | null;
+  profile_picture?: string;
   like_count: number;
   comment_count: number;
   avg_rating: number;
