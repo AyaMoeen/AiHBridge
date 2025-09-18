@@ -22,10 +22,12 @@ import CreatePostPage from "./pages/CreatePostPage";
 import AuthLayout from "./components/layout/AuthLayout";
 import MainLayout from "./components/layout/MainLayout";
 import { ProtectedRoute } from "./components/common/ProtectedRoute";
-import SignupPage from "./features/auth/pages/SignUpPage";
+
 import SavedPage from "./pages/SavedPage";
 import MySavedPost from "./pages/MySavedPost";
 import { SavedProvider } from "@/context/SavedContext";
+import SignupPage from "./features/auth/pages/SignupPage";
+import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {
   return (
@@ -135,6 +137,15 @@ function App() {
                           <MyPost />
                         </MainLayout>
                       </ProtectedRoute>
+                    }
+                  />
+                  
+                  <Route
+                    path="/users/:id"
+                    element={
+                      <MainLayout>
+                        <UserProfilePage />
+                      </MainLayout>
                     }
                   />
                   <Route
