@@ -22,3 +22,4 @@ export default function ShareAi({ profile_picture  }: props) {
     </Link>
   );
 }
+

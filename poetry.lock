@@ -247,6 +247,7 @@ docs = ["furo (>=2024.8.6)", "sphinx (>=5.0)", "sphinx-notfound-page"]
 testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)", "setuptools (>=71.0.0)"]
 
 [[package]]
+
 name = "django-stubs"
 version = "5.2.2"
 description = "Mypy stubs for Django"
@@ -918,4 +919,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "c38e0b37d89d72571be6d5d0c039bccf5d4f816e75b34c91d70972ae9cd32858"
+content-hash = "02b0f0a90bb1bb5afae0b614d04b2b4730cac4f4de410334a19a68115da3e58c"

@@ -16,6 +16,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -188,6 +189,7 @@ CONST_FIVE = 5
 LIMIT = 10
 RANGE = 15
 MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 HUGGINGFACE_API= os.getenv("HUGGINGFACE_API")
