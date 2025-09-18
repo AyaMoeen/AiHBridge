@@ -8,22 +8,25 @@ import SaveListDialog from "@/components/SaveListDialog";
 import { postService } from "@/features/posts/services/postService";
 import { useNavigate } from "react-router-dom";
 import { useSaved } from "@/context/SavedContext";
+import AiSummary from "./AiSummary";
+import { usePostContext } from "@/context/PostContext";
 
 interface props {
   like_count: number;
   comment_count: number;
   postId: number;
+  textToSummarize: string;
+  title: string;
 }
 export default function PostFooter({
   like_count,
   comment_count,
   postId,
+  textToSummarize,
+  title,
 }: props) {
-  
   const { isAuthenticated } = useAuth();
-  const [liked, setLiked] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [likeCount, setLikeCount] = useState(like_count);
   const [commentCount] = useState(comment_count);
   const [open, setOpen] = useState(false);
   const [showRequireLogin, setShowRequireLogin] = useState(false);
@@ -31,50 +34,21 @@ export default function PostFooter({
 
   const navigate = useNavigate();
 
+  const { likedPosts, likeCounts, toggleLike, setInitialLikeCount } =
+    usePostContext();
+  const liked = likedPosts.includes(postId);
+  const likeCount = likeCounts[postId] ?? like_count;
+
   useEffect(() => {
-    const fetchLiked = async () => {
-      if (!isAuthenticated) return;
-      try {
-        const likedPosts = await postService.getLikedPosts();
-        setLiked(likedPosts.includes(postId));
-      } catch (err) {
-        console.error("Failed to fetch liked posts:", err);
-      }
-    };
-    fetchLiked();
-  }, [isAuthenticated, postId]);
+    setInitialLikeCount(postId, like_count);
+  }, []);
 
   const handleLike = async () => {
     if (!isAuthenticated) {
       setShowRequireLogin(true);
       return;
     }
-    try {
-      if (liked) {
-        await postService.unlikePost(postId);
-        setLiked(false);
-        setLikeCount((prev) => prev - 1);
-      } else {
-        await postService.likePost(postId);
-        setLiked(true);
-        setLikeCount((prev) => prev + 1);
-      }
-    } catch (error) {
-      console.error("Failed to like/unlike post:", error);
-    }
-  };
-
-  const handleRate = async (value: number) => {
-    if (!isAuthenticated) {
-      setShowRequireLogin(true);
-      return;
-    }
-    try {
-      const res = postService.ratePost(postId, value);
-      console.log("Rate response:", res);
-    } catch (err) {
-      console.error("Failed to rate post:", err);
-    }
+    await toggleLike(postId);
   };
 
   useEffect(() => {
@@ -94,7 +68,6 @@ export default function PostFooter({
     };
     checkSaved();
   }, [isAuthenticated, postId]);
-
 
   const handleBookmark = async () => {
     if (!isAuthenticated) {
@@ -144,8 +117,9 @@ export default function PostFooter({
           <RatingDialog
             isAuthenticated={isAuthenticated}
             onRequireAuth={() => setShowRequireLogin(true)}
-            onRate={handleRate}
+            postId={postId}
           />
+          <AiSummary textToSummarize={textToSummarize} title={title} />
         </div>
         <div>
           <BookmarkPlus

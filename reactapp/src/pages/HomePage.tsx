@@ -17,7 +17,7 @@ export default function HomePage() {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,12 +50,11 @@ export default function HomePage() {
   return (
     <div className="flex flex-col items-start  mt-[20px] w-full">
       <div className="w-full flex flex-col items-center">
-        {isAuthenticated && (
-          <ShareAi
-            author={user?.name || "Guest"}
-            profile_picture={user?.profile_picture}
-          />
-        )}
+        <ShareAi
+          author={user?.name || "Guest"}
+          profile_picture={user?.profile_picture}
+        />
+
         <div className="flex  w-full px-4 mb-4">
           <label className="w-70 text-[var(--foreground)] font-medium ">
             Sorted By Category:

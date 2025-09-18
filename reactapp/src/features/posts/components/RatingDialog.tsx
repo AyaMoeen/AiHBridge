@@ -7,19 +7,21 @@ import {
 import RatingFaces from "./RatingFace";
 import { Star } from "lucide-react";
 import { useState } from "react";
+import { usePostContext } from "@/context/PostContext";
 interface RatingDialogProps {
   onRequireAuth?: () => void;
   isAuthenticated?: boolean;
-  onRate?: (value: number) => void;
+  postId: number;
 }
 
 export default function RatingDialog({
   onRequireAuth,
   isAuthenticated,
-  onRate,
+  postId,
 }: RatingDialogProps) {
   const [open, setOpen] = useState(false);
   const [selectedRating, setSelectedRating] = useState<number>(0);
+  const { ratePost } = usePostContext();
 
   const handleClick = () => {
     if (!isAuthenticated) {
@@ -28,9 +30,9 @@ export default function RatingDialog({
     }
     setOpen(true);
   };
-  const handleSubmit = () => {
-    if (selectedRating && onRate) {
-      onRate(selectedRating);
+  const handleSubmit = async () => {
+    if (selectedRating) {
+      await ratePost(postId, selectedRating);
       setOpen(false);
       setSelectedRating(0);
     }

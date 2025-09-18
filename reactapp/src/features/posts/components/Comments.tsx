@@ -5,14 +5,14 @@ import {
   postService,
   Comment as CommentType,
 } from "@/features/posts/services/postService";
+import { Avatar } from "@/components/ui/avatar";
 
 interface Props {
-  author: string;
   postId: number;
+  profile_picture?: string;
 }
 
-export default function Comments({ author, postId }: Props) {
-
+export default function Comments({ profile_picture, postId }: Props) {
   const [comments, setComments] = useState<CommentType[]>([]);
   const [text, setText] = useState("");
 
@@ -39,24 +39,18 @@ export default function Comments({ author, postId }: Props) {
     }
   };
 
-  const initials = author
-    ? author
-        .split(" ")
-        .filter(Boolean)
-        .map((name) => name[0])
-        .join("")
-        .toUpperCase()
-    : "??";
-    
   return (
     <div className="w-full  flex flex-col items-start justify-start space-y-4 border border-border bg-card text-card-foreground shadow-lg p-5 rounded-md">
       <h1 className="text-xl font-semibold text-foreground border-b border-border pb-2 w-full">
         Comments
       </h1>
       <div className="flex flex-row items-start gap-4 w-full">
-        <div className="w-12 h-12  rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
-          {initials}
-        </div>
+        <Avatar className="h-10 w-10">
+          <img
+            src={`http://127.0.0.1:8000/${profile_picture}`}
+            className="w-9 h-9 rounded-full object-cover"
+          />
+        </Avatar>
         <TextareaWithButton
           value={text}
           onChange={(e) => setText(e.target.value)}

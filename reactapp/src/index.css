@@ -238,3 +238,16 @@
 }
 
 
+@keyframes loading-text {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.animate-loading-text {
+  background-size: 200% auto;
+  animation: loading-text 1.5s linear infinite;
+}

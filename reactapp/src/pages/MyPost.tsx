@@ -51,7 +51,10 @@ export default function MyPost() {
   return (
     <div className="flex flex-col items-center justify-center mt-[20px] w-full">
       <h1 className="text-2xl font-bold mb-4">My Posts</h1>
-      <ShareAi author={user?.name || "Guest"} />
+      <ShareAi
+        author={user?.name || "Guest"}
+        profile_picture={user?.profile_picture}
+      />
       <div className="w-full flex flex-col items-center justify-center">
         {posts.length === 0 ? (
           <p className="text-[var(--foreground)] mt-4">

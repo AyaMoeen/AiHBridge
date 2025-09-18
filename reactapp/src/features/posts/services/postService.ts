@@ -311,6 +311,18 @@ class PostService {
       throw error;
     }
   }
+  async summarizeText(text: string): Promise<string> {
+    try {
+      const response: AxiosResponse<{ summary: string }> = await api.post(
+        "/summaries/summarize/",
+        { text }
+      );
+      return response.data.summary;
+    } catch (error) {
+      console.error("Failed to generate summary:", error);
+      throw error;
+    }
+  }
 }
 
 export const postService = new PostService();

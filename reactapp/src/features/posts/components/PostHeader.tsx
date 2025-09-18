@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { usePostContext } from "@/context/PostContext";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { Avatar } from "@radix-ui/react-avatar";
 import { ScreenShare, Star, Trash2 } from "lucide-react";
@@ -19,6 +20,7 @@ interface Props {
   onDeleteClick?: () => void;
   create_at: string;
   profile_picture?: string;
+  postId: number;
 }
 export default function PostHeader({
   name,
@@ -33,7 +35,10 @@ export default function PostHeader({
   showDelete = false,
   onDeleteClick,
   profile_picture,
+  postId,
 }: Props) {
+  const { ratings } = usePostContext();
+  const displayedRating = ratings[postId] ?? avg_rating;
   return (
     <CardHeader className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -97,7 +102,7 @@ export default function PostHeader({
           ))}
         </div>
         <span className="flex items-center gap-1 text-yellow-500 font-semibold">
-          <Star className="w-4 h-4 fill-yellow-500" /> {avg_rating}
+          <Star className="w-4 h-4 fill-yellow-500" /> {displayedRating}
         </span>
       </div>
     </CardHeader>
