@@ -43,7 +43,7 @@ class ProfileViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'], url_path="highlighted-tools")
     def highlighted_tools(self, request):
         profile = request.user.profile
-
+        limit=10
         posts = Post.objects.filter(
             categories__in=profile.interested_categories.all()
         ).annotate(
@@ -52,7 +52,7 @@ class ProfileViewSet(viewsets.ViewSet):
             avg_rating=Avg('ratings__value')
         ).distinct().order_by(
             '-avg_rating'
-        )
+        )[:limit]
         #'-likes_count', '-comments_count', 
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)

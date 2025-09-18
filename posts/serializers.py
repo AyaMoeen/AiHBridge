@@ -12,7 +12,7 @@ class PostSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
     name = serializers.CharField(source="user.name", read_only=True)
     profile_picture = serializers.ImageField(source="user.profile.profile_picture", read_only=True)
-
+    user_id = serializers.IntegerField(source="user.id", read_only=True)
     like_count = serializers.IntegerField(source="reactions.count", read_only=True)
     comment_count = serializers.IntegerField(source="comments.count", read_only=True)
     user = serializers.StringRelatedField(read_only=True)
@@ -30,13 +30,13 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = [
-        'id', 'user', 'title', 'link', 'description',
+        'id', 'user', 'user_id', 'title', 'link', 'description',
         'personal_review', 'categories', 'category_ids', 'created_at', 'updated_at',
         'username', 'name', 'profile_picture', 'like_count', 'comment_count',
         'avg_rating'
         ]
 
-        read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'username', 'name', 'profile_picture',]
+        read_only_fields = ['id', 'user_id', 'user', 'created_at', 'updated_at', 'username', 'name', 'profile_picture',]
         
     def to_representation(self, instance):
         """Add avg_rating dynamically from related Ratings"""
