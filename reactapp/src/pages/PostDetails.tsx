@@ -56,7 +56,7 @@ export default function PostDetails() {
       </div>
       <h1 className="text-2xl font-bold mb-4">{post.name}'s Post</h1>
       <Post post={post} maxChars={null} showLearnMore={false} />
-      <Comments postId={postId} author={user?.name || "Guest"} />
+      <Comments postId={postId}  profile_picture ={user?.profile_picture}/>
     </div>
   );
 }

@@ -84,6 +84,7 @@ export default function Post({
       setEditOpen(false);
     }
   };
+  const textToSummarize = `${postData.description} ${postData.personal_review}`;
 
   return (
     <div className="flex w-full flex-col items-center justify-center my-3">
@@ -102,6 +103,7 @@ export default function Post({
           name={postData.name}
           create_at={postData.created_at}
           profile_picture={postData.profile_picture}
+          postId={postData.id}
         />
 
         <PostContent
@@ -115,6 +117,8 @@ export default function Post({
           postId={postData.id}
           like_count={postData.like_count}
           comment_count={postData.comment_count}
+          textToSummarize={textToSummarize}
+          title = {postData.title}
         />
         {editOpen && (
           <EditPostDialog

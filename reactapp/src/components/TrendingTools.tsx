@@ -7,18 +7,22 @@ import {
   Post as PostType,
 } from "../features/posts/services/postService";
 import { useNavigate } from "react-router-dom";
+import { usePostContext } from "@/context/PostContext";
 
 export default function TrendingTools() {
-
   const [trendyPost, setTrendyPost] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
+  const { likeCounts, likedPosts, toggleLike, setInitialLikeCount } =
+    usePostContext();
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [postsData] = await Promise.all([postService.getTrendyTools()]);
+        const postsData = await postService.getTrendyTools();
         setTrendyPost(postsData);
+        postsData.forEach((tool) => {
+          setInitialLikeCount(tool.id, tool.like_count);
+        });
       } catch (error) {
         console.error("Failed to fetch data", error);
       } finally {
@@ -28,7 +32,7 @@ export default function TrendingTools() {
 
     fetchData();
   }, []);
-  
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -43,45 +47,63 @@ export default function TrendingTools() {
             scrollbarWidth: "none",
           }}
         >
-          {trendyPost.map((tool, index) => (
-            <li
-              key={tool.id}
-              className={`flex items-center justify-between text-sm `}
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div>
-                <p
-                  className={`text-[13px] mb-1 font-bold hover:cursor-pointer hover:text-accent-foreground cursor-pointer animate-fade-in`}
-                  onClick={() => navigate(`/posts/${tool.id}`)}
-                >
-                  {tool.title}
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {tool.categories.slice(0, 2).map((category) => (
-                    <Badge
-                      key={category.id}
-                      className="bg-accent text-accent-foreground text-xs text-[9px] hover:bg-primary hover:text-primary-foreground cursor-pointer"
-                    >
-                      {category.name}
-                    </Badge>
-                  ))}
-                  {tool.categories.length > 2 && (
-                    <Badge className="bg-primary text-primary-foreground text-xs ">
-                      +{tool.categories.length - 2}
-                    </Badge>
-                  )}
+          {trendyPost.map((tool, index) => {
+            const likeCount = likeCounts[tool.id] ?? tool.like_count;
+            const liked = likedPosts.includes(tool.id);
+            return (
+              <li
+                key={tool.id}
+                className={`flex items-center justify-between text-sm`}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div>
+                  <p
+                    className={`text-[13px] mb-1 font-bold hover:cursor-pointer hover:text-accent-foreground cursor-pointer animate-fade-in`}
+                    onClick={() => navigate(`/posts/${tool.id}`)}
+                  >
+                    {tool.title}
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {tool.categories.slice(0, 2).map((category) => (
+                      <Badge
+                        key={category.id}
+                        className="bg-accent text-accent-foreground text-xs text-[9px] hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                      >
+                        {category.name}
+                      </Badge>
+                    ))}
+                    {tool.categories.length > 2 && (
+                      <Badge className="bg-primary rounded text-primary-foreground text-[10px] w-8 h-4 flex flex-row justify-center items-center">
+                        +{tool.categories.length - 2}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="flex gap-4 text-muted-foreground">
-                <span className="flex items-center gap-1 text-xs">
-                  <Heart className="w-3 h-3" /> {tool.like_count}
-                </span>
-                <span className="flex items-center gap-1 text-xs">
-                  <MessageCircle className="w-3 h-3" /> {tool.comment_count}
-                </span>
-              </div>
-            </li>
-          ))}
+                <div className="flex gap-4 text-muted-foreground">
+                  <span
+                    className={`flex items-center gap-1 text-xs cursor-pointer ${
+                      liked
+                        ? "text-destructive fill-destructive"
+                        : "text-muted-foreground hover:text-destructive"
+                    }`}
+                    onClick={() => toggleLike(tool.id)}
+                  >
+                    <Heart
+                      className={`w-3 h-3 ${
+                        liked
+                          ? "text-destructive fill-destructive"
+                          : "text-muted-foreground hover:text-destructive"
+                      }`}
+                    />{" "}
+                    {likeCount}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs">
+                    <MessageCircle className="w-3 h-3" /> {tool.comment_count}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </CardContent>
     </Card>
