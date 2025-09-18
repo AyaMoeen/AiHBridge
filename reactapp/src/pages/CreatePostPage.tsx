@@ -48,7 +48,6 @@ export default function CreatePostPage() {
                 : [...prev.categories, category],
         }));
     };
-
     const handleSubmit = async () => {
         setIsSubmitting(true);
 
@@ -64,7 +63,7 @@ export default function CreatePostPage() {
     };
 
     const isFormValid =
-        formData.toolName && formData.description && formData.categories.length > 0 && formData.rating > 0;
+        formData.toolName && formData.description && formData.categories.length > 0;
 
     if (submitStatus === "success") {
         return (
