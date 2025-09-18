@@ -16,7 +16,7 @@ interface Props {
     user: string;
     username: string;
     name: string;
-    profile_picture: string | null;
+    profile_picture?: string;
     like_count: number;
     comment_count: number;
     avg_rating: number;
@@ -51,6 +51,8 @@ export default function Post({
     comment_count: post.comment_count,
     name: post.name,
     username: post.username,
+    created_at: post.created_at,
+    profile_picture: post.profile_picture,
   });
 
   const [editOpen, setEditOpen] = useState(false);
@@ -82,11 +84,12 @@ export default function Post({
       setEditOpen(false);
     }
   };
+
   return (
     <div className="flex w-full flex-col items-center justify-center my-3">
       <Card className="shadow-lg border  bg-card text-card-foreground flex flex-col justify-center w-full p-5">
         <PostHeader
-          author={Number(postData.author)}
+          author={postData.author}
           badges={postData.categories || []}
           link={postData.link}
           title={postData.title}
@@ -97,6 +100,8 @@ export default function Post({
           avg_rating={postData.avg_rating}
           username={postData.username}
           name={postData.name}
+          create_at={postData.created_at}
+          profile_picture={postData.profile_picture}
         />
 
         <PostContent

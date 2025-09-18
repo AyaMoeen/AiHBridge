@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { formatRelativeTime } from "@/utils/formatRelativeTime";
+import { Avatar } from "@radix-ui/react-avatar";
 import { ScreenShare, Star, Trash2 } from "lucide-react";
 import { SquarePen } from "lucide-react";
-import { Link } from "react-router-dom";
-
 interface Props {
-  author: number;
+  author: string;
   badges: { id: number; name: string }[];
   avg_rating: number;
   link: string;
@@ -17,47 +17,45 @@ interface Props {
   onEditClick?: () => void;
   showDelete?: boolean;
   onDeleteClick?: () => void;
+  create_at: string;
+  profile_picture?: string;
 }
-
 export default function PostHeader({
-  author,
   name,
   username,
   badges,
   avg_rating,
   link,
   title,
+  create_at,
   showEdit = false,
   onEditClick,
   showDelete = false,
   onDeleteClick,
+  profile_picture,
 }: Props) {
   return (
     <CardHeader className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link
-            to={`/users/${author}`}
-            className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold"
-          >
-            {name
-              ? name
-                .split(" ")
-                .map((n) => n[0])
-                .slice(0, 2)
-                .join("")
-              : "AU"}
-          </Link>
+          <Avatar className="h-10 w-10">
+            <img
+              src={profile_picture}
+              className="w-9 h-9 rounded-full object-cover"
+            />
+          </Avatar>
           <div className="flex flex-col">
             <CardTitle className="text-sm font-semibold text-foreground">
               {name}
             </CardTitle>
             <span className="text-[10px] text-muted-foreground">
-              @{username}
+              {username}
             </span>
           </div>
+          <div className="text-sm font-semibold text-gray-500">
+            • {formatRelativeTime(create_at)}
+          </div>
         </div>
-
         <div className="flex items-center gap-4">
           <a href={link} target="_blank" rel="noopener noreferrer">
             <Button variant="ghost" className="p-5 hover:cursor-pointer">
@@ -84,11 +82,9 @@ export default function PostHeader({
           )}
         </div>
       </div>
-
       <CardTitle className="text-lg font-bold text-foreground my-1">
         {title}
       </CardTitle>
-
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           {badges.map((badge) => (

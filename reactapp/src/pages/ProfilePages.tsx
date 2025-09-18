@@ -1,226 +1,210 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
 import {
-    profileService,
-    ProfileData,
-    UpdateProfileRequest
-} from "@/services/profileService";
-import ProfileOverview from "@/components/ProfileOverview";
+    Mail,
+    MapPin,
+    Link,
+    Calendar,
+    Edit,
+    Save,
+    Camera,
+} from "lucide-react";
+import type { ProfileData, UpdateProfileRequest } from "@/types/profile";
+
+
+// Mock data - replace with actual API calls
+const mockProfileData: ProfileData = {
+    user: {
+        id: "1",
+        email: "john.doe@example.com",
+        firstName: "John",
+        lastName: "Doe",
+        username: "johndoe",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        bio: "AI enthusiast and full-stack developer. I love discovering and sharing innovative AI tools that can boost productivity and creativity.",
+        location: "San Francisco, CA",
+        website: "https://johndoe.dev",
+        company: "TechCorp Inc.",
+        jobTitle: "Senior Frontend Developer",
+        phone: "+1 (555) 123-4567",
+        birthDate: "1990-05-15",
+        isVerified: true,
+        createdAt: "2023-01-15T00:00:00Z",
+        updatedAt: "2024-12-01T00:00:00Z"
+    },
+    stats: {
+        posts: 12,
+        followers: 245,
+        following: 89,
+        likes: 1420
+    },
+    settings: {
+        isPublic: true,
+        showEmail: false,
+        showPhone: false,
+        allowMessages: true,
+        emailNotifications: true,
+        pushNotifications: false
+    },
+    socialLinks: {
+        twitter: "https://twitter.com/johndoe",
+        linkedin: "https://linkedin.com/in/johndoe",
+        github: "https://github.com/johndoe"
+    }
+};
+
 
 export default function ProfilePage() {
     const { user: authUser } = useAuth();
-    const { toast } = useToast();
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    // State
-    const [profileData, setProfileData] = useState<ProfileData | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setSaving] = useState(false);
-    const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
+    const [profileData, setProfileData] = useState<ProfileData>(mockProfileData);
+    const [isEditing, setIsEditing] = useState(false);
     const [editForm, setEditForm] = useState<UpdateProfileRequest>({
-        firstName: "",
-        lastName: "",
-        username: "",
-        bio: "",
+        firstName: profileData.user.firstName,
+        lastName: profileData.user.lastName,
+        username: profileData.user.username,
+        bio: profileData.user.bio,
+        location: profileData.user.location,
+        website: profileData.user.website,
+        company: profileData.user.company,
+        jobTitle: profileData.user.jobTitle,
+        phone: profileData.user.phone
     });
 
-    // Load profile data
-    useEffect(() => {
-        console.log('🚀 ProfilePage mounted, loading profile data...');
-        console.log('👤 Auth user:', authUser);
-        loadProfileData();
-    }, []);
-
-    const loadProfileData = async () => {
-        try {
-            console.log('📋 Starting profile data load...');
-            setIsLoading(true);
-            setError(null);
-
-            // Check if user is authenticated
-            if (!authUser) {
-                console.warn('⚠️ No authenticated user found');
-                setError("You must be logged in to view your profile");
-                return;
+    const handleSaveProfile = () => {
+        // TODO: Call API to update profile
+        setProfileData(prev => ({
+            ...prev,
+            user: {
+                ...prev.user,
+                ...editForm
             }
-
-            console.log('🔄 Calling profileService.getCurrentUserProfile()...');
-            const data = await profileService.getCurrentUserProfile();
-            console.log('✅ Profile data loaded successfully:', data);
-
-            setProfileData(data);
-
-            // Initialize edit form
-            const formData = {
-                firstName: data.user.firstName,
-                lastName: data.user.lastName,
-                username: data.user.username || "",
-                bio: data.user.bio || "",
-            };
-            console.log('📝 Initializing edit form with:', formData);
-            setEditForm(formData);
-
-        } catch (error: any) {
-            console.error('❌ Failed to load profile data:', error);
-            const errorMessage = error.message || "Failed to load profile";
-            setError(errorMessage);
-
-            toast({
-                title: "Error Loading Profile",
-                description: errorMessage,
-                variant: "destructive"
-            });
-        } finally {
-            setIsLoading(false);
-            console.log('🏁 Profile data load completed');
-        }
+        }));
+        setIsEditing(false);
     };
 
-    const handleSaveProfile = async () => {
-        if (!profileData) {
-            console.warn('⚠️ No profile data available for save');
-            return;
-        }
 
-        try {
-            console.log('💾 Starting profile save...');
-            setSaving(true);
-            setError(null);
+    const ProfileOverview = () => (
+        <div className="space-y-6">
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex flex-col md:flex-row items-start gap-6">
+                        <div className="relative">
+                            <Avatar className="h-32 w-32">
+                                <AvatarImage src={profileData.user.avatar} />
+                                <AvatarFallback className="text-2xl">
+                                    {profileData.user.firstName[0]}{profileData.user.lastName[0]}
+                                </AvatarFallback>
+                            </Avatar>
+                            <Button
+                                size="icon"
+                                variant="secondary"
+                                className="absolute -bottom-2 -right-2 rounded-full"
+                            >
+                                <Camera className="h-4 w-4" />
+                            </Button>
+                        </div>
 
-            // Calculate what actually changed
-            const updates: UpdateProfileRequest = {};
-            for (const key in editForm) {
-                const formValue = editForm[key as keyof UpdateProfileRequest];
-                const currentValue = profileData.user[key as keyof typeof profileData.user];
+                        <div className="flex-1 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <div>
+                                    <h1 className="text-2xl font-bold flex items-center gap-2">
+                                        {profileData.user.firstName} {profileData.user.lastName}
 
-                if (formValue !== currentValue) {
-                    updates[key as keyof UpdateProfileRequest] = formValue;
-                    console.log(`📝 Field changed - ${key}: "${currentValue}" -> "${formValue}"`);
-                }
-            }
+                                    </h1>
+                                    <p className="text-muted-foreground">@{profileData.user.username}</p>
+                                </div>
+                            </div>
 
-            if (Object.keys(updates).length === 0) {
-                console.log('ℹ️ No changes detected');
-                toast({
-                    title: "No Changes",
-                    description: "No changes to save."
-                });
-                return;
-            }
-
-            console.log('📤 Saving updates:', updates);
-            const updatedUser = await profileService.updateProfile(updates);
-            console.log('✅ Profile updated successfully:', updatedUser);
-
-            setProfileData(prev =>
-                prev ? { ...prev, user: updatedUser } : null
-            );
-
-            toast({
-                title: "Success",
-                description: "Profile updated successfully!"
-            });
-        } catch (error: any) {
-            console.error('❌ Failed to save profile:', error);
-            const errorMessage = error.message || "Failed to save profile";
-            setError(errorMessage);
-
-            toast({
-                title: "Error Saving Profile",
-                description: errorMessage,
-                variant: "destructive"
-            });
-        } finally {
-            setSaving(false);
-            console.log('🏁 Profile save completed');
-        }
-    };
-
-    const handleAvatarChange = async (file: File) => {
-        if (!profileData) {
-            console.warn('⚠️ No profile data available for avatar upload');
-            return;
-        }
-
-        try {
-            console.log('📸 Starting avatar upload:', file.name);
-            setIsUploadingAvatar(true);
-
-            const newAvatarUrl = await profileService.uploadAvatar(file);
-            console.log('✅ Avatar uploaded successfully:', newAvatarUrl);
-
-            setProfileData(prev =>
-                prev ? { ...prev, user: { ...prev.user, avatar: newAvatarUrl } } : null
-            );
-
-            toast({
-                title: "Success",
-                description: "Profile picture updated!"
-            });
-        } catch (error: any) {
-            console.error('❌ Failed to upload avatar:', error);
-            toast({
-                title: "Error Uploading Avatar",
-                description: error.message || "Failed to upload avatar",
-                variant: "destructive"
-            });
-        } finally {
-            setIsUploadingAvatar(false);
-            console.log('🏁 Avatar upload completed');
-        }
-    };
-
-    if (isLoading) {
-        return (
-            <div className="container mx-auto p-6 max-w-5xl">
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-                        <p className="text-lg">Loading your profile...</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">{profileData.stats.posts}</div>
+                                    <div className="text-sm text-muted-foreground">AI Tools Shared</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">15</div>
+                                    <div className="text-sm text-muted-foreground">Tools Saved</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-2xl font-bold">{profileData.stats.likes}</div>
+                                    <div className="text-sm text-muted-foreground">Total Likes</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        );
-    }
+                </CardContent>
+            </Card>
 
-    // Show error state
-    if (error && !profileData) {
-        return (
-            <div className="container mx-auto p-6 max-w-5xl">
-                <div className="flex items-center justify-center min-h-[400px]">
-                    <div className="text-center max-w-md">
-                        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                        <h2 className="text-2xl font-bold mb-2">Unable to Load Profile</h2>
-                        <p className="text-muted-foreground mb-4">{error}</p>
-                        <button
-                            onClick={loadProfileData}
-                            className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
-                        >
-                            Try Again
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
+            <Card>
+                <CardHeader>
+                    <CardTitle>About Me</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="firstName">First Name</Label>
+                                    <Input
+                                        id="firstName"
+                                        value={editForm.firstName}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, firstName: e.target.value }))}
+                                        className="border-gray-200"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="lastName">Last Name</Label>
+                                    <Input
+                                        id="lastName"
+                                        value={editForm.lastName}
+                                        onChange={(e) => setEditForm(prev => ({ ...prev, lastName: e.target.value }))}
+                                        className="border-gray-200"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    id="username"
+                                    value={editForm.username}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, username: e.target.value }))}
+                                    className="border-gray-200"
+                                />
+                            </div>
+
+                            <div>
+                                <Label htmlFor="bio">Bio</Label>
+                                <Textarea
+                                    id="bio"
+                                    value={editForm.bio}
+                                    onChange={(e) => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                                    rows={3}
+                                    placeholder="Tell the community about your AI interests and expertise..."
+                                    className="border-gray-200"
+                                />
+                            </div>
+                            <Button onClick={handleSaveProfile} className="w-full">
+                                <Save className="h-4 w-4 mr-2" />
+                                Save Changes
+                            </Button>
+                        </div>
+            
+                    
+                </CardContent>
+            </Card>
+        </div>
+    );
 
     return (
         <div className="container mx-auto p-6 max-w-5xl">
-            <ProfileOverview
-                profileData={profileData}
-                isLoading={isLoading}
-                error={error}
-                editForm={editForm}
-                setEditForm={setEditForm}
-                handleSaveProfile={handleSaveProfile}
-                handleAvatarChange={handleAvatarChange}
-                isSaving={isSaving}
-                isUploadingAvatar={isUploadingAvatar}
-                fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
-            />
+            <ProfileOverview />
         </div>
     );
 }
