@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,6 +37,7 @@ INSTALLED_APPS: list[str] = [
     "corsheaders",
     'rest_framework',
     'rest_framework.authtoken',
+    'summaries.apps.SummariesConfig',
     'interactions.apps.InteractionsConfig',
     'search.apps.SearchConfig',
     'accounts.apps.AccountsConfig',
@@ -185,3 +188,5 @@ LIMIT = 10
 RANGE = 15
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+HUGGINGFACE_API= os.getenv("HUGGINGFACE_API")

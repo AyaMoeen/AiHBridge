@@ -29,7 +29,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('profiles/', include('profiles.urls')),
     path('savedlists/', include('SavedLists.urls')),
-        
+    path('summaries/', include('summaries.urls')), 
 ]
 
 if settings.DEBUG:
