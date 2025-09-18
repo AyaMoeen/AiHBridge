@@ -31,7 +31,7 @@ class PostViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
+        if self.action in ["list", "retrieve", "top_posts"]:
             permission_classes = [permissions.AllowAny]
         elif self.action == "create":
             permission_classes = [permissions.IsAuthenticated]
