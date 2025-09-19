@@ -30,7 +30,8 @@ const ContactUsPage = () => {
         message: ''
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState(null);
+    const [submitStatus, setSubmitStatus] = useState<'success' | null>(null);
+    // const [submitStatus, setSubmitStatus] = useState(null);
 
     const contactReasons = [
         {
@@ -86,7 +87,14 @@ const ContactUsPage = () => {
         }
     ];
 
-    const handleInputChange = (e) => {
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         [name]: value
+    //     }));
+    // };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -94,7 +102,8 @@ const ContactUsPage = () => {
         }));
     };
 
-    const handleCategorySelect = (category) => {
+
+    const handleCategorySelect = (category:string) => {
         setFormData(prev => ({
             ...prev,
             category: category,
@@ -107,7 +116,6 @@ const ContactUsPage = () => {
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-
         // Simulate form submission
         setTimeout(() => {
             setSubmitStatus('success');
