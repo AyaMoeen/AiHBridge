@@ -22,7 +22,7 @@ import type { ProfileData, UpdateProfileRequest } from "@/types/profile";
 // Mock data - replace with actual API calls
 const mockProfileData: ProfileData = {
     user: {
-        id: "1",
+        id: 1,
         email: "john.doe@example.com",
         firstName: "John",
         lastName: "Doe",

@@ -104,7 +104,7 @@ export const AuthStatus: React.FC = () => {
                     <div className="space-y-2">
                         <h4 className="text-sm font-medium text-gray-700">Interests</h4>
                         <div className="flex flex-wrap gap-1">
-                            {user.interests.map((interest, index) => (
+                            {user.interests.map((interest: string, index: number) => (
                                 <span
                                     key={index}
                                     className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
@@ -112,6 +112,15 @@ export const AuthStatus: React.FC = () => {
                                     {interest}
                                 </span>
                             ))}
+
+                            {/* {user.interests.map((interest, index) => (
+                                <span
+                                    key={index}
+                                    className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
+                                >
+                                    {interest}
+                                </span>
+                            ))} */}
                         </div>
                     </div>
                 )}
