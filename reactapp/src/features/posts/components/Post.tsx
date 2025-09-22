@@ -5,24 +5,9 @@ import PostFooter from "./PostFooter";
 import EditPostDialog from "./EditPostDialog";
 import { useState } from "react";
 import { postService } from "../services/postService";
+
 interface Props {
-  post: {
-    id: number;
-    title: string;
-    description: string;
-    personal_review: string;
-    link: string;
-    categories: { id: number; name: string }[];
-    user: string;
-    username: string;
-    name: string;
-    profile_picture?: string;
-    like_count: number;
-    comment_count: number;
-    avg_rating: number;
-    created_at: string;
-    updated_at: string;
-  };
+  post: any;
   maxChars?: number | null;
   showLearnMore?: boolean;
   showEdit?: boolean;
@@ -30,47 +15,22 @@ interface Props {
   onDeleteClick?: () => void;
 }
 
-export default function Post({
-  post,
-  maxChars = 150,
-  showLearnMore,
-  showEdit,
-  showDelete,
-  onDeleteClick,
-}: Props) {
+export default function Post({ post, maxChars = 150, showLearnMore, showEdit, showDelete, onDeleteClick }: Props) {
   const [postData, setPostData] = useState({
-    id: post.id,
-    author: post.user,
-    title: post.title,
-    description: post.description,
-    personal_review: post.personal_review,
-    link: post.link,
-    categories: post.categories,
-    avg_rating: post.avg_rating,
-    like_count: post.like_count,
-    comment_count: post.comment_count,
-    name: post.name,
-    username: post.username,
-    created_at: post.created_at,
-    profile_picture: post.profile_picture,
+    ...post,
+    userId: post.user_id || post.id, // ensure userId exists
   });
 
   const [editOpen, setEditOpen] = useState(false);
 
-  const handleSave = async (updated: {
-    title: string;
-    description: string;
-    personal_review: string;
-    link: string;
-    badges: { id: number; name: string }[];
-  }) => {
+  const handleSave = async (updated: any) => {
     try {
       const response = await postService.updatePost(postData.id, {
         title: updated.title,
         description: updated.description,
         link: updated.link,
         personal_review: updated.personal_review,
-        category_ids: updated.badges.map((b) => b.id),
+        category_ids: updated.badges.map((b: any) => b.id),
       });
 
       setPostData({
@@ -84,13 +44,15 @@ export default function Post({
       setEditOpen(false);
     }
   };
+
   const textToSummarize = `${postData.description} ${postData.personal_review}`;
 
   return (
     <div className="flex w-full flex-col items-center justify-center my-3">
-      <Card className="shadow-lg border  bg-card text-card-foreground flex flex-col justify-center w-full p-5">
+      <Card className="shadow-lg border bg-card text-card-foreground flex flex-col justify-center w-full p-5">
         <PostHeader
-          author={postData.author}
+          authorId={postData.userId}
+          author={postData.user}
           badges={postData.categories || []}
           link={postData.link}
           title={postData.title}
@@ -105,7 +67,6 @@ export default function Post({
           profile_picture={postData.profile_picture}
           postId={postData.id}
         />
-
         <PostContent
           postId={postData.id}
           description={postData.description}
@@ -118,7 +79,7 @@ export default function Post({
           like_count={postData.like_count}
           comment_count={postData.comment_count}
           textToSummarize={textToSummarize}
-          title = {postData.title}
+          title={postData.title}
         />
         {editOpen && (
           <EditPostDialog

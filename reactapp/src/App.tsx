@@ -27,6 +27,7 @@ import SavedPage from "./pages/SavedPage";
 import MySavedPost from "./pages/MySavedPost";
 import { SavedProvider } from "@/context/SavedContext";
 import { PostProvider } from "@/context/PostContext";
+import UserProfilePage from "./pages/UserProfilePage";
 
 function App() {
   return (
@@ -117,6 +118,16 @@ function App() {
                         <ProtectedRoute>
                           <MainLayout>
                             <ProfilePage />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                       <Route
+                      path="/otherProfile/:id"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <UserProfilePage />
                           </MainLayout>
                         </ProtectedRoute>
                       }

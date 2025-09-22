@@ -84,13 +84,17 @@ class PostService {
     categories: number[];
   }): Promise<Post> {
     try {
-      const response: AxiosResponse<Post> = await api.post("/posts/", data);
+      const response: AxiosResponse<Post> = await api.post("/posts/", {
+        ...data,
+        category_ids: data.categories, // 👈 backend expects this
+      });
       return response.data;
     } catch (error) {
       console.error("Failed to create post:", error);
       throw error;
     }
   }
+
 
   async getPosts(): Promise<Post[]> {
     try {

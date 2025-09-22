@@ -27,7 +27,7 @@ export default function ShareAi({ profile_picture }: props) {
           <Avatar className="h-10 w-10">
             {isAuthenticated ? (
               <img
-                src={`http://127.0.0.1:8000/${profile_picture}`}
+                src={`http://127.0.0.1:8000/${profile_picture}`} 
                 className="w-9 h-9 rounded-full object-cover"
                 alt="User Avatar"
               />
