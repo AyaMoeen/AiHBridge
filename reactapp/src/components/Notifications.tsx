@@ -18,9 +18,11 @@ import {
 } from "@/services/notificationsServics";
 import { Button } from "./ui/button";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
+import { useNavigate } from "react-router-dom";
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotifications();
@@ -37,7 +39,8 @@ export default function Notifications() {
     }
   }
 
-  async function handleMarkAsRead(id: number) {
+  async function handleMarkAsRead(id: number, actor: number) {
+    navigate(`/otherProfile/${actor}`);
     try {
       await markAsRead(id);
       setNotifications((prev) =>
@@ -96,7 +99,7 @@ export default function Notifications() {
         {notifications.map((n) => (
           <DropdownMenuItem
             key={n.id}
-            onClick={() => handleMarkAsRead(n.id)}
+            onClick={() => handleMarkAsRead(n.id, n.actor)}
             className={`flex gap-4 mb-1 items-center cursor-pointer rounded-lg transition-colors ${
               n.read
                 ? "bg-white hover:bg-gray-50"

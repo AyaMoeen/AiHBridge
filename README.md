@@ -1,247 +1,76 @@
+# **AiHBridge – AI Tools Discovery & Review Platform**
 
-```
-AiHBridge
-├─ accounts
-│  ├─ admin.py
-│  ├─ apps.py
-│  ├─ migrations
-│  │  └─ __init__.py
-│  ├─ models.py
-│  ├─ serializers.py
-│  ├─ tests.py
-│  ├─ urls.py
-│  ├─ utils.py
-│  ├─ views.py
-│  └─ __init__.py
-├─ core
-│  ├─ apps.py
-│  ├─ management
-│  │  ├─ commands
-│  │  │  ├─ seed.py
-│  │  │  └─ __init__.py
-│  │  └─ __init__.py
-│  └─ __init__.py
-├─ interactions
-│  ├─ admin.py
-│  ├─ apps.py
-│  ├─ migrations
-│  │  └─ __init__.py
-│  ├─ mixins.py
-│  ├─ models.py
-│  ├─ serializers.py
-│  ├─ services.py
-│  ├─ tests.py
-│  ├─ urls.py
-│  ├─ views.py
-│  └─ __init__.py
-├─ manage.py
-├─ media
-│  └─ profile_pics
-│     ├─ defaultpic.png
-│     ├─ test.png
-│     ├─ test_nLGjkuL.png
-│     ├─ test_sJ9edCH.png
-│     └─ YousefJaar.PNG
-├─ poetry.lock
-├─ posts
-│  ├─ admin.py
-│  ├─ apps.py
-│  ├─ migrations
-│  │  └─ __init__.py
-│  ├─ models.py
-│  ├─ serializers.py
-│  ├─ tests.py
-│  ├─ urls.py
-│  ├─ views.py
-│  └─ __init__.py
-├─ profiles
-│  ├─ admin.py
-│  ├─ apps.py
-│  ├─ migrations
-│  │  └─ __init__.py
-│  ├─ models.py
-│  ├─ serializers.py
-│  ├─ signals.py
-│  ├─ tests.py
-│  ├─ urls.py
-│  ├─ views.py
-│  └─ __init__.py
-├─ project
-│  ├─ asgi.py
-│  ├─ settings.py
-│  ├─ urls.py
-│  ├─ wsgi.py
-│  └─ __init__.py
-├─ pyproject.toml
-├─ reactapp
-│  ├─ .env
-│  ├─ build
-│  │  ├─ asset-manifest.json
-│  │  ├─ favicon.ico
-│  │  ├─ index.html
-│  │  ├─ logo192.png
-│  │  ├─ logo512.png
-│  │  ├─ manifest.json
-│  │  ├─ robots.txt
-│  │  └─ static
-│  │     ├─ css
-│  │     │  ├─ main.f855e6bc.css
-│  │     │  └─ main.f855e6bc.css.map
-│  │     ├─ js
-│  │     │  ├─ 453.9ee576b5.chunk.js
-│  │     │  ├─ 453.9ee576b5.chunk.js.map
-│  │     │  ├─ main.d07e3984.js
-│  │     │  ├─ main.d07e3984.js.LICENSE.txt
-│  │     │  └─ main.d07e3984.js.map
-│  │     └─ media
-│  │        └─ logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg
-│  ├─ components.json
-│  ├─ eslint.config.js
-│  ├─ index.html
-│  ├─ package-lock.json
-│  ├─ package.json
-│  ├─ postcss.config.cjs
-│  ├─ public
-│  │  ├─ favicon.ico
-│  │  ├─ index.html
-│  │  ├─ logo192.png
-│  │  ├─ logo512.png
-│  │  ├─ manifest.json
-│  │  ├─ robots.txt
-│  │  └─ vite.svg
-│  ├─ README.md
-│  ├─ src
-│  │  ├─ App.css
-│  │  ├─ App.tsx
-│  │  ├─ assets
-│  │  │  └─ react.svg
-│  │  ├─ components
-│  │  │  ├─ app-sidebar.tsx
-│  │  │  ├─ common
-│  │  │  │  ├─ AuthStatus.tsx
-│  │  │  │  ├─ DemoCredentials.tsx
-│  │  │  │  ├─ ProtectedRoute.tsx
-│  │  │  │  └─ ThemeToggle.tsx
-│  │  │  ├─ Header.tsx
-│  │  │  ├─ HighlightedTools.tsx
-│  │  │  ├─ nav-main.tsx
-│  │  │  ├─ nav-projects.tsx
-│  │  │  ├─ nav-user.tsx
-│  │  │  ├─ RightBar.tsx
-│  │  │  ├─ team-switcher.tsx
-│  │  │  ├─ TrendingTools.tsx
-│  │  │  └─ ui
-│  │  │     ├─ avatar.tsx
-│  │  │     ├─ badge.tsx
-│  │  │     ├─ breadcrumb.tsx
-│  │  │     ├─ button.tsx
-│  │  │     ├─ card.tsx
-│  │  │     ├─ collapsible.tsx
-│  │  │     ├─ dialog.tsx
-│  │  │     ├─ dropdown-menu.tsx
-│  │  │     ├─ form.tsx
-│  │  │     ├─ input.tsx
-│  │  │     ├─ InputWithIcon.tsx
-│  │  │     ├─ label.tsx
-│  │  │     ├─ LearnMoreButton.tsx
-│  │  │     ├─ select.tsx
-│  │  │     ├─ separator.tsx
-│  │  │     ├─ sheet.tsx
-│  │  │     ├─ sidebar.tsx
-│  │  │     ├─ skeleton.tsx
-│  │  │     ├─ tabs.tsx
-│  │  │     ├─ textarea.tsx
-│  │  │     ├─ TextAreaWithButton.tsx
-│  │  │     ├─ toggle.tsx
-│  │  │     └─ tooltip.tsx
-│  │  ├─ context
-│  │  │  ├─ AuthContext.tsx
-│  │  │  └─ ThemeContext.tsx
-│  │  ├─ features
-│  │  │  ├─ auth
-│  │  │  │  ├─ components
-│  │  │  │  │  └─ empty
-│  │  │  │  ├─ forms
-│  │  │  │  │  ├─ ForgotPasswordForm.tsx
-│  │  │  │  │  ├─ LoginForm.tsx
-│  │  │  │  │  ├─ ResetPasswordForm.tsx
-│  │  │  │  │  └─ VerificationForm.tsx
-│  │  │  │  ├─ pages
-│  │  │  │  │  ├─ ForgotPasswordPage.tsx
-│  │  │  │  │  ├─ LoginPage.tsx
-│  │  │  │  │  ├─ ResetPasswordPage.tsx
-│  │  │  │  │  └─ VerificationPage.tsx
-│  │  │  │  └─ services
-│  │  │  │     └─ authService.ts
-│  │  │  └─ posts
-│  │  │     ├─ components
-│  │  │     │  ├─ Comment.tsx
-│  │  │     │  ├─ Comments.tsx
-│  │  │     │  ├─ DeletePostAlert.tsx
-│  │  │     │  ├─ EditPostDialog.tsx
-│  │  │     │  ├─ empty
-│  │  │     │  ├─ FilterSelect.tsx
-│  │  │     │  ├─ Post.tsx
-│  │  │     │  ├─ PostContent.tsx
-│  │  │     │  ├─ PostFooter.tsx
-│  │  │     │  ├─ PostHeader.tsx
-│  │  │     │  ├─ RatingDialog.tsx
-│  │  │     │  ├─ RatingFace.tsx
-│  │  │     │  └─ ShareAi.tsx
-│  │  │     ├─ forms
-│  │  │     │  └─ empty
-│  │  │     ├─ mock-data
-│  │  │     │  └─ mockPosts.ts
-│  │  │     ├─ pages
-│  │  │     │  └─ empty
-│  │  │     └─ services
-│  │  │        └─ empty
-│  │  ├─ hooks
-│  │  │  ├─ use-mobile.ts
-│  │  │  ├─ useAuth.ts
-│  │  │  └─ useTheme.ts
-│  │  ├─ index.css
-│  │  ├─ lib
-│  │  │  └─ utils.ts
-│  │  ├─ main.tsx
-│  │  ├─ pages
-│  │  │  ├─ AboutusPage.tsx
-│  │  │  ├─ ContactusPage.tsx
-│  │  │  ├─ HomePage.tsx
-│  │  │  ├─ MyPost.tsx
-│  │  │  ├─ MySavedPost.tsx
-│  │  │  ├─ PostDetails.tsx
-│  │  │  ├─ ProfilePages.tsx
-│  │  │  └─ SingUp.tsx
-│  │  ├─ routes
-│  │  │  └─ empty
-│  │  ├─ services
-│  │  │  ├─ authService.ts
-│  │  │  └─ empty
-│  │  ├─ types
-│  │  │  ├─ auth.ts
-│  │  │  └─ profile.ts
-│  │  ├─ utils
-│  │  │  ├─ passwordValidation.ts
-│  │  │  └─ tokenManager.ts
-│  │  └─ vite-env.d.ts
-│  ├─ tailwind.config.cjs
-│  ├─ tsconfig.app.json
-│  ├─ tsconfig.json
-│  ├─ tsconfig.node.json
-│  ├─ tsconfig.tsbuildinfo
-│  └─ vite.config.ts
-└─ search
-   ├─ admin.py
-   ├─ apps.py
-   ├─ migrations
-   │  └─ __init__.py
-   ├─ models.py
-   ├─ serializers.py
-   ├─ tests.py
-   ├─ urls.py
-   ├─ utils.py
-   ├─ views.py
-   └─ __init__.py
+## **Overview**
 
-```
+AiHBridge is a web platform where users can **_discover, share, and review AI tools_** across categories like design, programming, business, and education. We built this project as part of the **_Market Ready Developer Training – Cohort 2 at GSG Company_** as a hands-on exercise to create a professional and user-friendly web application.
+
+**Project Aim:**  
+To provide a **_community-driven platform_** where users can share their experiences, interact with posts, save favorite tools, and explore trending AI tools—helping them make **_clear and informed decisions_** in the fast-growing AI landscape.
+
+## **Key Features**
+
+- **User Management:** Register, login, logout, profile customization, secure authentication
+- **Content Management:** Create, edit, delete AI tool posts with name, description, link, category, and personal review
+- **Community Interaction:** Like, comment, bookmark posts, personal favorites, follow users & notifications, trending posts, post ratings
+- **Search & Filtering:** Quickly find AI tools via keywords or categories
+- **Advanced AI Integration:** ChatGPT-based content summarization
+
+---
+
+## **System Architecture**
+
+The AiHBridge platform consists of **Frontend** and **Backend**, working together for a smooth user experience.
+
+### *_Frontend_*
+
+**Core Responsibilities:**
+
+- **Pages & Navigation:** Home, Search/Filter, Profile, Post Detail, Create/Edit pages
+- **User Management:** Register, login, logout, profile customization
+- **Content Interaction:** Like, comment, bookmark posts, personal favorites, follow users with notifications, trending posts, highlighted posts, post ratings
+- **Advanced AI Features:** ChatGPT-based content summarization
+- **API Integration:** Communicate with backend via REST APIs
+- **UI/UX:** Responsive, accessible, clean, and readable interface
+
+### *_Backend_*
+
+**Core Responsibilities:**
+
+- **User Management:** Registration, authentication, profile handling, secure password storage, session management
+- **Post & Content Management:** CRUD operations for posts and categories, link posts to categories, manage reviews
+- **Community Interactions:** Likes, comments, bookmarks, personal favorites, trending posts, highlighted posts
+- **Search & Filtering:** Efficient search by keywords or categories
+- **API Endpoints:** RESTful APIs for frontend communication, request validation, and error handling
+
+## **Technical Stack**
+
+### Frontend
+
+- **React** + **Vite** + **TypeScript**
+- **TailwindCSS** + **shadcn/ui**
+- **React Router v6** & **React Context**
+- **Axios**
+
+### Backend
+
+- **Python** + **Django**
+- **SQLite**
+
+## **Project Contributors**
+
+| **Name**       | **Role**                                |
+| -------------- | --------------------------------------- |
+| Raghad Taqatqa | Team Lead - Back-End                    |
+| Aya Moeen      | Backend Developer / QA Tester           |
+| Osama Ghneem   | Frontend Developer / Documentation Lead |
+| Ahmad Tomeh    | Frontend Developer                      |
+
+## **Deployment / Live Demo**
+
+You can access the live version of AiHBridge here: [Live Demo](https://your-deployment-link.com)
+
+## **Project Management**
+
+**Trello Board:** [Trello](https://trello.com/invite/b/68a89c1d6cf17fc39528808b/ATTId469e9cc65b7010473a44a9399cf1ca1FA756EE2/my-trello-board)
+
+**Proposal Document:** You can view the proposal document [here](link-to-proposal-document)
