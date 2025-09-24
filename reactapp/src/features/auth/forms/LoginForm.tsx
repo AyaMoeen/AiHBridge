@@ -97,7 +97,7 @@ export function LoginForm({
     }
 
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className={cn("flex flex-col gap-6 shadow-lg rounded-xl", className)} {...props}>
             <Card className="">
                 <CardHeader>
                     <div className="flex items-center justify-center gap-2">
@@ -127,7 +127,7 @@ export function LoginForm({
                                     type="email"
                                     placeholder="m@example.com"
                                     className={cn(
-                                        "border-gray-200",
+                                        "border-gray-300",
                                         formErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""
                                     )}
                                     value={formData.email}
@@ -146,7 +146,7 @@ export function LoginForm({
                                     <button
                                         type="button"
                                         onClick={() => navigate("/forgot-password")}
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-blue-600"
+                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline text-blue-600 cursor-pointer"
                                         disabled={isLoading}
                                     >
                                         Forgot your password?
@@ -157,7 +157,7 @@ export function LoginForm({
                                     name="password"
                                     type="password"
                                     className={cn(
-                                        "border-gray-200",
+                                        "border-gray-300",
                                         formErrors.password ? "border-red-500 focus-visible:ring-red-500" : ""
                                     )}
                                     placeholder="Enter your password"
@@ -174,7 +174,7 @@ export function LoginForm({
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
-                                    className="w-full"
+                                    className="w-full cursor-pointer"
                                     disabled={isLoading}
                                 >
                                     {isLoading ? (
@@ -194,7 +194,7 @@ export function LoginForm({
                             <button
                                 type="button"
                                 onClick={() => navigate("/register")}
-                                className="underline underline-offset-4 text-blue-600 hover:text-blue-800"
+                                className="underline underline-offset-4 text-blue-600 hover:text-blue-800 cursor-pointer"
                                 disabled={isLoading}
                             >
                                 Sign up

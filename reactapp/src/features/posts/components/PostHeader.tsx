@@ -1,13 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardHeader, CardTitle } from "@/components/ui/card";
+import { usePostContext } from "@/context/PostContext";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { Avatar } from "@radix-ui/react-avatar";
 import { ScreenShare, Star, Trash2, SquarePen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
-  authorId: number; // userId
+  authorId: number;
   author: string;
   badges: { id: number; name: string }[];
   avg_rating: number;
@@ -40,8 +41,9 @@ export default function PostHeader({
   profile_picture,
   postId,
 }: Props) {
+  const { ratings } = usePostContext();
+  const displayedRating = ratings[postId] ?? avg_rating;
   const navigate = useNavigate();
-  const displayedRating = avg_rating;
 
   const goToProfile = () => {
     navigate(`/otherProfile/${authorId}`);

@@ -161,21 +161,22 @@ class AuthService {
             }
 
             if (error.response?.data) {
-                const apiError: ApiError = error.response.data;
+                throw error;
+                // const apiError: ApiError = error.response.data;
 
-                // Handle validation errors
-                if (apiError.errors) {
-                    const firstError = Object.values(apiError.errors)[0];
-                    throw new Error(Array.isArray(firstError) ? firstError[0] : firstError);
-                }
+                // // Handle validation errors
+                // if (apiError.errors) {
+                //     const firstError = Object.values(apiError.errors)[0];
+                //     throw new Error(Array.isArray(firstError) ? firstError[0] : firstError);
+                // }
 
-                const errorMessage =
-                    apiError.detail ||
-                    apiError.message ||
-                    apiError.error ||
-                    (apiError.non_field_errors && apiError.non_field_errors[0]) ||
-                    'Registration failed';
-                throw new Error(errorMessage);
+                // const errorMessage =
+                //     apiError.detail ||
+                //     apiError.message ||
+                //     apiError.error ||
+                //     (apiError.non_field_errors && apiError.non_field_errors[0]) ||
+                //     'Registration failed';
+                // throw new Error(errorMessage);
             }
 
             throw new Error('Network error. Please check your connection.');

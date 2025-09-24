@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import PostComponent from "@/features/posts/components/Post";
 import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { userProfileService } from "@/services/userProfileService";
 import { Post, ProfileData } from "@/services/profileTypes";
@@ -73,23 +73,26 @@ export default function UserProfilePage() {
             {/* Profile Card */}
             <Card>
                 <CardContent className="flex items-center justify-between gap-4 p-6">
-                    <div className="flex flex-row">
-                        <Avatar className="h-20 w-20">
-                            <AvatarImage src={userProfile.user.avatar} />
-                            <AvatarFallback>{userProfile.user.username}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                            <h2 className="text-xl font-bold">
-                                {userProfile.user.firstName} {userProfile.user.lastName}
-                            </h2>
-                            <p className="text-muted-foreground">@{userProfile.user.username}</p>
-                            {userProfile.user.bio && <p className="mt-2">{userProfile.user.bio}</p>}
-
-                            <Button className="mt-2" onClick={toggleFollow}>
-                                {isFollowing ? "Unfollow" : "Follow"}
-                            </Button>
-                        </div>
-                    </div>
+                      <div className="flex items-start gap-4">
+            <Avatar className="h-15 w-15 flex-shrink-0">
+              <img
+                src={userProfile.user.avatar}
+                className="w-14 h-14 rounded-full object-cover"
+              />
+            </Avatar>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-bold">
+                {userProfile.user.firstName} {userProfile.user.lastName}
+              </h2>
+              <p className="text-muted-foreground text-[12px]">@{userProfile.user.username}</p>
+              {userProfile.user.bio && (
+                <p className="mt-1 text-sm">{userProfile.user.bio}</p>
+              )}
+              <Button className="mt-2 w-max" onClick={toggleFollow}>
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Button>
+            </div>
+          </div>
                     <div className="grid grid-cols-3 gap-4 text-center mr-10">
                         <div>
                             <p className="text-2xl font-bold">{userProfile.stats.posts}</p>

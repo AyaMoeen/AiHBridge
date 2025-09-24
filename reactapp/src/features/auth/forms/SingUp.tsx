@@ -77,8 +77,17 @@ export default function SignUp() {
     try {
       await register(name, email, password, username);
       navigate("/");
-    } catch (err) {
-      console.error("Registration failed:", err);
+    } catch (err: any) {
+      if (err.response?.data) {
+        const apiErrors = err.response.data;
+        setFormErrors({
+          ...formErrors,
+          email: apiErrors.email?.[0],
+          username: apiErrors.username?.[0],
+        });
+      } else {
+        console.error("Registration failed:", err);
+      }
     }
   };
 
@@ -98,7 +107,6 @@ export default function SignUp() {
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}
-
       <div className="flex flex-col w-full gap-2 mt-3 mb-2">
         <h2 className="text-sm">Full Name</h2>
         <InputWithIcon
@@ -158,7 +166,6 @@ export default function SignUp() {
           <p className="text-xs text-red-500">{formErrors.email}</p>
         )}
       </div>
-
       <div className="flex flex-col w-full gap-2 mt-3 mb-2">
         <h2 className="text-sm">Password</h2>
         <InputWithIcon
