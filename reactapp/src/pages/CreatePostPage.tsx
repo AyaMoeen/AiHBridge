@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, PlusCircle, CheckCircle, AlertCircle, Wand2, Globe } from "lucide-react";
-
+import { postService } from "../features/posts/services/postService"
 export default function CreatePostPage() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,22 +16,19 @@ export default function CreatePostPage() {
         toolName: "",
         toolUrl: "",
         description: "",
-        categories: [] as string[],
-        newCategory: "",
-        rating: 0,
+        categories: [] as number[], // store IDs now
         opinion: "",
     });
 
-    const categories = [
-        "Design Tools",
-        "Programming",
-        "Business & Productivity",
-        "Education & Learning",
-        "Content Creation",
-        "Data Analysis",
-        "Marketing",
-        "Communication",
-    ];
+    const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+
+    // Fetch categories from API
+    useEffect(() => {
+        fetch("http://127.0.0.1:8000/posts/categories")
+            .then((res) => res.json())
+            .then((data) => setCategories(data))
+            .catch((err) => console.error("Error fetching categories:", err));
+    }, []);
 
     const handleInputChange = (field: string, value: string | number) => {
         setFormData((prev) => ({
@@ -40,31 +37,40 @@ export default function CreatePostPage() {
         }));
     };
 
-    const handleCategoryToggle = (category: string) => {
+    const handleCategoryToggle = (id: number) => {
         setFormData((prev) => ({
             ...prev,
-            categories: prev.categories.includes(category)
-                ? prev.categories.filter((c) => c !== category)
-                : [...prev.categories, category],
+            categories: prev.categories.includes(id)
+                ? prev.categories.filter((c) => c !== id)
+                : [...prev.categories, id],
         }));
     };
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
+        try {
+            const payload = {
+                title: formData.toolName,
+                link: formData.toolUrl,
+                description: formData.description,
+                personal_review: formData.opinion,
+                categories: formData.categories,
+            };
 
-        // Simulate API call
-        setTimeout(() => {
+            await postService.createPost(payload);
+
             setSubmitStatus("success");
+            setTimeout(() => navigate("/"), 2000);
+        } catch (error) {
+            console.error("Error creating post:", error);
+            setSubmitStatus("error");
+        } finally {
             setIsSubmitting(false);
-
-            setTimeout(() => {
-                navigate("/");
-            }, 2000);
-        }, 2000);
+        }
     };
 
     const isFormValid =
-        formData.toolName && formData.description && formData.categories.length > 0 && formData.rating > 0;
+        formData.toolName && formData.description && formData.categories.length > 0;
 
     if (submitStatus === "success") {
         return (
@@ -143,17 +149,18 @@ export default function CreatePostPage() {
                         <div className="flex flex-wrap gap-2 mt-2">
                             {categories.map((category) => (
                                 <Button
-                                    key={category}
+                                    key={category.id}
                                     type="button"
-                                    variant={formData.categories.includes(category) ? "default" : "outline"}
-                                    onClick={() => handleCategoryToggle(category)}
+                                    variant={formData.categories.includes(category.id) ? "default" : "outline"}
+                                    onClick={() => handleCategoryToggle(category.id)}
                                     size="sm"
                                 >
-                                    {category}
+                                    {category.name}
                                 </Button>
                             ))}
                         </div>
                     </div>
+
                     {/* Opinion */}
                     <div>
                         <Label htmlFor="opinion">Your Opinion</Label>
@@ -172,7 +179,7 @@ export default function CreatePostPage() {
                         <div className="flex items-center gap-2 p-3 bg-yellow-50 text-yellow-800 rounded-lg border border-yellow-200">
                             <AlertCircle className="w-5 h-5" />
                             <span className="text-sm">
-                                Please fill in the required fields: Tool Name, Description, Categories, and Rating
+                                Please fill in the required fields: Tool Name, Description, and Categories
                             </span>
                         </div>
                     )}
