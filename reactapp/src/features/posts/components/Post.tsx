@@ -18,7 +18,7 @@ interface Props {
 export default function Post({ post, maxChars = 150, showLearnMore, showEdit, showDelete, onDeleteClick }: Props) {
   const [postData, setPostData] = useState({
     ...post,
-    userId: post.user_id || post.id, // ensure userId exists
+    userId: post.user_id || post.id, 
   });
 
   const [editOpen, setEditOpen] = useState(false);

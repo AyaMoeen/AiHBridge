@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Avatar } from "@radix-ui/react-avatar";
 import { User } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface props {
   author: string;
@@ -13,6 +13,7 @@ interface props {
 export default function ShareAi({ profile_picture }: props) {
   const { isAuthenticated } = useAuth();
   const [showRequireLogin, setShowRequireLogin] = useState(false);
+  const location = useLocation();
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!isAuthenticated) {
@@ -22,7 +23,7 @@ export default function ShareAi({ profile_picture }: props) {
   };
   return (
     <>
-      <Link to="/create-post" className="w-full" onClick={handleClick}>
+      <Link to="/create-post" className="w-full" onClick={handleClick} state={{ from: location.pathname }}>
         <div className="w-full flex items-center justify-start gap-4 text-card-foreground shadow-lg p-5 rounded-md mb-6 hover:cursor-pointer">
           <Avatar className="h-10 w-10">
             {isAuthenticated && profile_picture ? (
