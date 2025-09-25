@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface Props {
   postId: number;
@@ -7,9 +7,11 @@ interface Props {
 
 export default function LearnMoreButton({ postId }: Props) {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const handleClick = () => {
-    navigate(`/posts/${postId}`);
+    navigate(`/posts/${postId}`, {
+      state: { from: location.pathname },
+    });
   };
 
   return (

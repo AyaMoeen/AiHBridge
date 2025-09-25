@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,8 @@ export default function CreatePostPage() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
+    const location = useLocation();
+    const from = (location.state as { from?: string })?.from || "/";
     const [formData, setFormData] = useState({
         toolName: "",
         toolUrl: "",
@@ -60,7 +61,7 @@ export default function CreatePostPage() {
             await postService.createPost(payload);
 
             setSubmitStatus("success");
-            setTimeout(() => navigate("/"), 2000);
+            setTimeout(() => navigate(from), 2000);
         } catch (error) {
             console.error("Error creating post:", error);
             setSubmitStatus("error");
