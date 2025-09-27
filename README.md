@@ -48,7 +48,7 @@ AiHBridge is a community-driven platform that helps users find the right AI tool
 ### Client–Server Architecture
 - **Frontend (React SPA)**: Responsible for UI/UX, routing, and sending API requests.  
 - **Backend (Django REST Framework)**: Exposes RESTful APIs, handles business logic, authentication, and database interactions.  
-- **Database (PostgreSQL/SQLite)**: Stores persistent data (users, posts, interactions, follows, bookmarks).  
+- **Database (SQLite)**: Stores persistent data (users, posts, interactions, follows, bookmarks).  
 
 ### Backend Architecture 
 - **Views** → Receive API requests, delegate logic to services.  
@@ -130,14 +130,12 @@ AiHBridge is a community-driven platform that helps users find the right AI tool
   * Services handle business logic separately.
   * Mixins provide focused shared functionality.
 * **Open/Closed Principle (OCP)**
-  * Custom permission classes (`IsOwnerOrReadOnly`) extend base rules.
+  * Custom permission 
   * Observer pattern enables new event-driven features without modifying core logic.
   * Services allow extending functionality without breaking views.
 * **Liskov Substitution Principle (LSP)**
   * Custom User model (extending `AbstractUser`) integrates seamlessly with Django’s auth.
-  * Substituting models and serializers doesn’t break existing functionality.
 * **Interface Segregation Principle (ISP)**
-  * Clean API endpoints expose only necessary actions.
   * Separate serializers return only required fields.
 * **Dependency Inversion Principle (DIP)**
   * High-level modules (views) depend on abstractions, not implementations.
@@ -173,10 +171,6 @@ AiHBridge is a community-driven platform that helps users find the right AI tool
   * Views orchestrate requests/responses without containing heavy logic.
 * **Factory Method Pattern**
   * `UserManager.create_user` and `create_superuser` act as controlled factories.
-* **Repository Pattern**
-  * Custom managers (e.g., `UserManager`) encapsulate data access logic.
-* **Encapsulation**
-  * Sensitive operations (e.g., password hashing, reset code expiry) hidden within models and utilities.
 
 ---
 
@@ -200,6 +194,16 @@ AiHBridge is a community-driven platform that helps users find the right AI tool
 * Secrets stored securely (AWS Parameter Store, not hardcoded).
 * Database constraints (`unique_together`) prevent duplicates (likes, follows).
 
+---
+## Testing & Code Quality & Deployment 
+###	Testing
+*	Backend tested with pytest (unit + integration tests).
+*	Automated validation of business logic
+###	Code Quality
+*	Ruff → Python linter & static analysis.
+*	ESLint → Enforces consistency in React frontend.
+###	Deployment on AWS
+*	Deployment code on AWS Ec2 storage.
 ---
 
 ## Developers Roles
