@@ -183,16 +183,10 @@ AiHBridge is a community-driven platform that helps users find the right AI tool
   * Secure token-based authentication system.
   * Modular structure: *Models → Services → Serializers → Views → Routes*.
   * Easy onboarding with clear app separation.
+  * Secrets stored securely (AWS Parameter Store, not hardcoded).
+  * Database constraints (`unique_together`) prevent duplicates (likes, follows).
 
----
 
-### Security
-
-* Token-based authentication (DRF Token Auth).
-* Password hashing with Django’s secure hashers.
-* Permission-based access control (`IsAuthenticated`, `IsOwnerOrReadOnly`).
-* Secrets stored securely (AWS Parameter Store, not hardcoded).
-* Database constraints (`unique_together`) prevent duplicates (likes, follows).
 
 ---
 ## Testing & Code Quality & Deployment 
