@@ -237,7 +237,7 @@ We use modern tools for team collaboration and API testing:
 
 * You can access the Proposal Document [Here](https://www.notion.so/AI-Tools-Discovery-Review-Platform-25b1d966a54b808d901af2e9f8a2af66?source=copy_link)
 * You can access the Quick Demo [here](https://drive.google.com/file/d/1iXRstrGfx5X80MsRJorBtnEPXZagrPYm/view?usp=drive_link)
-* You can access the live version of AiHBridge [here](http://44.199.99.84/)
+
 ---
 ## Acknowledgements
 
