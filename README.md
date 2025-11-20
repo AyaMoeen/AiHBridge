@@ -230,13 +230,13 @@ We use modern tools for team collaboration and API testing:
 
 
 * **Postman Workspace** → For testing, sharing, and documenting REST APIs.
-  👉 [Postman Workspace Link](https://app.getpostman.com/join-team?invite_code=31a8a552d94bd34b4f5021b4154dc3a53b58397db2273f800be9568d478f6ed2&target_code=31136fb814ed5e2f8de6d1883c45088f)
+  👉 [Postman Workspace Link](https://www.postman.com/gsg222/gsg-workspace/collection/gdl12v3)
 
 ---
 ## Project Resources
 
 * You can access the Proposal Document [Here](https://www.notion.so/AI-Tools-Discovery-Review-Platform-25b1d966a54b808d901af2e9f8a2af66?source=copy_link)
-* You can access the Quick Demo [here](https://drive.google.com/file/d/1iXRstrGfx5X80MsRJorBtnEPXZagrPYm/view?usp=drive_link)
+* You can access the Quick Demo [here](https://drive.google.com/file/d/1A_z1GadfcW5KH3vwt8487ETerFTdQxUj/view?usp=sharing)
 
 ---
 ## Acknowledgements
